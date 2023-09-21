@@ -67,8 +67,8 @@ namespace MultiThread
             while (!File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}") && iterator < 100)
                 ++iterator;
 
-            while (File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}"));
-                File.Delete(String.Format(fString, iterator++));
+            while (File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}")) ;
+            File.Delete(String.Format(fString, iterator++));
         }
     }
 
