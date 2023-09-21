@@ -11,3 +11,6 @@ jobs:
       - name: Build
         shell: bash
         run: for f in $(find . -name "*.sln"); do dotnet build $f; done
+      - name: Testing
+	shell: bash
+        run: for f in $(find . -name "*.sln"); do dotnet test $f; done
