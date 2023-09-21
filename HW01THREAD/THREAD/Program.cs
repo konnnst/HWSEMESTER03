@@ -5,9 +5,8 @@ using System.IO;
 using System.Threading;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
-namespace THREAD
+namespace MultiThread
 {
     static class ListStatsExtension
     {
@@ -46,12 +45,14 @@ namespace THREAD
             return Math.Sqrt(sum / (numbers.Count() - 1));
         }
     }
+
     class Constants
     {
         public static string CurrentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\";
         public static string MatrixPath = CurrentFolder + "matrix_{0}.txt";
         public static string ResultPath = CurrentFolder + "README.md";
     }
+
     class FileCleaner
     {
         /// <summary>
@@ -61,7 +62,7 @@ namespace THREAD
         /// <param name="fString"></param>
         public static void ClearByFstring(string fString)
         {
-            int iterator = 0;
+            var iterator = 0;
 
             while (!File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}") && iterator < 100)
                 ++iterator;
@@ -70,6 +71,7 @@ namespace THREAD
                 File.Delete(String.Format(fString, iterator++));
         }
     }
+
     class MultBenchmark
     {
         /// <summary>
@@ -91,10 +93,10 @@ namespace THREAD
             result.WriteLine("|-|-|-|-|-|-|");
             for (int sizeLog = 0; sizeLog <= sizeLogMax; ++sizeLog)
             {
-                int size = Convert.ToInt32(Math.Pow(2, sizeLog));
+                var size = Convert.ToInt32(Math.Pow(2, sizeLog));
                 var single = new List<double>();
                 var multi = new List<double>();
-                for (int i = 0; i < 8; ++i)
+                for (var i = 0; i < 8; ++i)
                 {
                     var a = new Matrix(size, size);
                     var b = new Matrix(size, size);
@@ -132,15 +134,13 @@ namespace THREAD
             return Convert.ToDouble(timer.ElapsedMilliseconds);
         }
     }
+
     public class Matrix
     {
-        #region parameters
         int[,] matrix;
         int Width { get; set; }
         int Height { get; set; }
-        #endregion
 
-        #region constructor
         /// <summary>
         /// Creates matrix with random elements by given height and width
         /// </summary>
@@ -152,9 +152,9 @@ namespace THREAD
             this.Width = w; this.Height = h;
 
             Random random = new Random();
-            for (int i = 0; i < h; ++i)
+            for (var i = 0; i < h; ++i)
             {
-                for (int k = 0; k < w; ++k)
+                for (var k = 0; k < w; ++k)
                     matrix[i, k] = random.Next(-5, 5);
             }
         }
@@ -173,7 +173,7 @@ namespace THREAD
             StreamReader reader = new StreamReader(Constants.CurrentFolder + fileName);
             int w;
             string line;
-            List<int[]> matrix = new List<int[]>();
+            var matrix = new List<int[]>();
 
             if ((line = reader.ReadLine()) == null)
             {
@@ -207,6 +207,7 @@ namespace THREAD
                     this.matrix[i, k] = matrix[i][k];
             }
         }
+
         /// <summary>
         /// Creates matrix by given 2d array
         /// </summary>
@@ -218,9 +219,6 @@ namespace THREAD
             this.Width = matrix.GetLength(1);
         }
 
-        #endregion
-
-        #region output
         /// <summary>
         /// Returns matrix width
         /// </summary>
@@ -245,7 +243,7 @@ namespace THREAD
         /// </summary>
         public void Save()
         {
-            int i = -1;
+            var i = -1;
             while (File.Exists(String.Format(Constants.MatrixPath, ++i))) { }
             this.Save(i);
         }
@@ -282,17 +280,14 @@ namespace THREAD
         /// </summary>
         public void Print()
         {
-            for (int i = 0; i < this.Height; ++i)
+            for (var i = 0; i < this.Height; ++i)
             {
-                for (int k = 0; k < this.Width; ++k)
+                for (var k = 0; k < this.Width; ++k)
                     Console.Write("{0} ", this.matrix[i, k].ToString().PadLeft(4));
                 Console.WriteLine();
             }
         }
 
-        #endregion
-
-        #region operations
         /// <summary>
         /// Multiplies two matrices taken from files and writes to file in
         /// folder with .exe
@@ -347,9 +342,9 @@ namespace THREAD
             if (a.Width != b.Width || a.Height != b.Height)
                 return false;
 
-            for (int i = 0; i < a.Height; ++i)
+            for (var i = 0; i < a.Height; ++i)
             {
-                for (int j = 0; j < a.Width; ++j)
+                for (var j = 0; j < a.Width; ++j)
                 {
                     if (a.matrix[i, j] != b.matrix[i, j])
                         return false;
@@ -369,14 +364,14 @@ namespace THREAD
         {
             if (a.Width != b.Height)
                 return null;
-            Matrix c = new Matrix(a.Height, b.Width);
+            var c = new Matrix(a.Height, b.Width);
 
-            for (int i = 0; i < a.Height; ++i)
+            for (var i = 0; i < a.Height; ++i)
             {
-                for (int j = 0; j < b.Width; ++j)
+                for (var j = 0; j < b.Width; ++j)
                 {
                     c.matrix[i, j] = 0;
-                    for (int k = 0; k < b.Height; ++k)
+                    for (var k = 0; k < b.Height; ++k)
                         c.matrix[i, j] += a.matrix[i, k] * b.matrix[k, j];
                 }
             }
@@ -404,21 +399,21 @@ namespace THREAD
                 return null;
             }
 
-            Matrix c = new Matrix(a.Height, b.Width);
-            Thread[] threads = new Thread[threadCount];
-            int threadPiece = a.Height / threadCount + Convert.ToInt32(a.Height % threadCount != 0);
+            var c = new Matrix(a.Height, b.Width);
+            var threads = new Thread[threadCount];
+            var threadPiece = a.Height / threadCount + Convert.ToInt32(a.Height % threadCount != 0);
 
-            for (int i = 0; i < threadCount; ++i)
+            for (var i = 0; i < threadCount; ++i)
             {
-                int localI = i;
+                var localI = i;
                 threads[i] = new Thread(() =>
                 {
-                    for (int n = threadPiece * localI; n < threadPiece * (localI + 1) && n < a.Height; ++n)
+                    for (var n = threadPiece * localI; n < threadPiece * (localI + 1) && n < a.Height; ++n)
                     {
-                        for (int j = 0; j < b.Width; ++j)
+                        for (var j = 0; j < b.Width; ++j)
                         {
                             c.matrix[n, j] = 0;
-                            for (int k = 0; k < a.Width; ++k)
+                            for (var k = 0; k < a.Width; ++k)
                                 c.matrix[n, j] += a.matrix[n, k] * b.matrix[k, j];
                         }
                     }
@@ -426,16 +421,16 @@ namespace THREAD
 
             }
 
-            for (int i = 0; i < threads.Length; ++i)
+            for (var i = 0; i < threads.Length; ++i)
                 threads[i].Start();
 
-            for (int i = 0; i < threads.Length; ++i)
+            for (var i = 0; i < threads.Length; ++i)
                 threads[i].Join();
 
             return c;
         }
-        #endregion
     }
+
     internal class Program
     {
         static void Main()
