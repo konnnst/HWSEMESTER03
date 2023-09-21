@@ -7,10 +7,15 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace P09THREAD
+namespace THREAD
 {
     static class ListStatsExtension
     {
+        /// <summary>
+        /// Counts median of list
+        /// </summary>
+        /// <param name="numbers">List of double numbers</param>
+        /// <returns>Median of list</returns>
         public static double Median(this List<double> numbers)
         {
             if (numbers.Count == 0)
@@ -26,6 +31,11 @@ namespace P09THREAD
             return numbers[halfIndex];
         }
 
+        /// <summary>
+        /// Counts standart deviation of list elements
+        /// </summary>
+        /// <param name="numbers">List of double numbers</param>
+        /// <returns>Standart deviation of list elements</returns>
         public static double StandardDeviation(this List<double> numbers)
         {
             if (numbers.Count == 0)
@@ -44,9 +54,17 @@ namespace P09THREAD
     }
     class FileCleaner
     {
+        /// <summary>
+        /// Clears files in .exe directory by format string with one iterator 
+        /// Example: "matrix_{iterator}.txt"
+        /// </summary>
+        /// <param name="fString"></param>
         public static void ClearByFstring(string fString)
         {
             int iterator = 0;
+
+            while (!File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}") && iterator < 100)
+                ++iterator;
 
             while (File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}"));
                 File.Delete(String.Format(fString, iterator++));
@@ -54,14 +72,24 @@ namespace P09THREAD
     }
     class MultBenchmark
     {
+        /// <summary>
+        /// Creates benchmark object
+        /// </summary>
         public MultBenchmark() { }
+
+        /// <summary>
+        /// Writes comparision stats for single and multi threads
+        /// matrix multiplication for matrices size up to 2^sizeLogmax
+        /// </summary>
+        /// <param name="threadCount">Threads count in multithreading mode</param>
+        /// <param name="sizeLogMax">Log_2 of max size matrix if stats row</param>
         public void StatsTable(int threadCount, int sizeLogMax)
         {
             var result = new StreamWriter(Constants.ResultPath);
             result.WriteLine("Executed on Asus D509D (AMD Ryzen 3 3200U, 2 core, 4 threads)");
             result.WriteLine("|Mode|Size|Mean|Median|St.dev.|Boost|");
             result.WriteLine("|-|-|-|-|-|-|");
-            for (int sizeLog = 0; sizeLog < sizeLogMax; ++sizeLog)
+            for (int sizeLog = 0; sizeLog <= sizeLogMax; ++sizeLog)
             {
                 int size = Convert.ToInt32(Math.Pow(2, sizeLog));
                 var single = new List<double>();
@@ -78,11 +106,12 @@ namespace P09THREAD
                 result.WriteLine("|Multi|{0}|{1} ms|{2} ms|{3} ms|{4} times|",
                     size, multi.Average(), multi.Median(), multi.StandardDeviation(), single.Average() / multi.Average());
                 result.Flush();
+                Console.WriteLine("Worked on {0}x{1} matrix", size, size);
             }
 
             result.Close();
         }
-        public double TestSingleThread(Matrix a, Matrix b)
+        private double TestSingleThread(Matrix a, Matrix b)
         {
             var timer = new Stopwatch();
 
@@ -92,7 +121,7 @@ namespace P09THREAD
 
             return Convert.ToDouble(timer.ElapsedMilliseconds);
         }
-        public double TestMultiThread(Matrix a, Matrix b, int threadCount)
+        private double TestMultiThread(Matrix a, Matrix b, int threadCount)
         {
             var timer = new Stopwatch();
 
@@ -112,6 +141,11 @@ namespace P09THREAD
         #endregion
 
         #region constructor
+        /// <summary>
+        /// Creates matrix with random elements by given height and width
+        /// </summary>
+        /// <param name="h">Matrix height</param>
+        /// <param name="w">Matrix width</param>
         public Matrix(int h, int w)
         {
             this.matrix = new int[h, w];
@@ -124,6 +158,11 @@ namespace P09THREAD
                     matrix[i, k] = random.Next(-5, 5);
             }
         }
+        /// <summary>
+        /// Reads matrix from given file
+        /// </summary>
+        /// <param name="fileName">Name of file to read from /bin project folder</param>
+        /// <exception cref="FormatException"></exception>
         public Matrix(string fileName)
         {
             if (!File.Exists(Constants.CurrentFolder + fileName))
@@ -168,6 +207,10 @@ namespace P09THREAD
                     this.matrix[i, k] = matrix[i][k];
             }
         }
+        /// <summary>
+        /// Creates matrix by given 2d array
+        /// </summary>
+        /// <param name="newMatrix">2d array of mattrix coefficients</param>
         public Matrix(int[,] newMatrix)
         {
             this.matrix = newMatrix;
@@ -178,24 +221,52 @@ namespace P09THREAD
         #endregion
 
         #region output
+        /// <summary>
+        /// Returns matrix width
+        /// </summary>
+        /// <returns></returns>
         public int GetWidth()
         {
             return this.Width;
         }
+
+        /// <summary>
+        /// Returns matrix height
+        /// </summary>
+        /// <returns></returns>
         public int GetHeight()
         {
             return this.Height;
         }
 
+        /// <summary>
+        /// Saves matrix to file in directory, where .exe located
+        /// with name "matrix_{index}.txt" with first free index
+        /// </summary>
         public void Save()
         {
             int i = -1;
             while (File.Exists(String.Format(Constants.MatrixPath, ++i))) { }
             this.Save(i);
         }
-        public void Save(int FileIndex)
+
+        /// <summary>
+        /// Saves matrix to file in directory, where .exe located
+        /// with name "matrix_{index}.txt", if not matrix with this
+        /// index not exists
+        /// </summary>
+        /// <param name="fileIndex">index in matrix file name</param>
+        public void Save(int fileIndex)
         {
-            StreamWriter writer = new StreamWriter(String.Format(Constants.MatrixPath, FileIndex));
+            int maxIndex = 0;
+            while (File.Exists(String.Format(Constants.MatrixPath, ++maxIndex))) { }
+            if (maxIndex > fileIndex)
+            {
+                Console.WriteLine("File with this index already exists");
+                return;
+            }
+
+            StreamWriter writer = new StreamWriter(String.Format(Constants.MatrixPath, fileIndex));
             for (int i = 0; i < this.Height; ++i)
             {
                 for (int k = 0; k < this.Width; ++k)
@@ -205,12 +276,16 @@ namespace P09THREAD
             writer.Write("{0} {1}", this.Height, this.Width);
             writer.Close();
         }
+
+        /// <summary>
+        /// Prints matrix in console
+        /// </summary>
         public void Print()
         {
             for (int i = 0; i < this.Height; ++i)
             {
                 for (int k = 0; k < this.Width; ++k)
-                    Console.Write("{0} ", this.matrix[i, k].ToString().PadLeft(6));
+                    Console.Write("{0} ", this.matrix[i, k].ToString().PadLeft(4));
                 Console.WriteLine();
             }
         }
@@ -218,7 +293,14 @@ namespace P09THREAD
         #endregion
 
         #region operations
-        static public void MultFiles(string f1, string f2, int threadCount)
+        /// <summary>
+        /// Multiplies two matrices taken from files and writes to file in
+        /// folder with .exe
+        /// </summary>
+        /// <param name="f1">First matrix file name</param>
+        /// <param name="f2">Second matix file name</param>
+        /// <param name="threadCount">Count of threads for multiplication</param>
+        static public void FileMultThread(string f1, string f2, int threadCount)
         {
             if (!File.Exists(f1) || !File.Exists(f2))
             {
@@ -232,6 +314,34 @@ namespace P09THREAD
 
             c.Save();
         }
+
+        /// <summary>
+        /// Multiplies two matrices taken from files and
+        /// writes result in folder with .exe file
+        /// </summary>
+        /// <param name="f1">First matrix</param>
+        /// <param name="f2">Second matrix</param>
+        static public void FileMult(string f1, string f2)
+        {
+            if (!File.Exists(f1) || !File.Exists(f2))
+            {
+                Console.WriteLine("Files not exits");
+                return;
+            }
+            var a = new Matrix(f1);
+            var b = new Matrix(f2);
+
+            var c = Mult(a, b);
+
+            c.Save();
+        }
+
+        /// <summary>
+        /// Checks if two matrices equal
+        /// </summary>
+        /// <param name="a">First matrix</param>
+        /// <param name="b">Second matrix</param>
+        /// <returns>True if equal, else false</returns>
         static public bool Compare(Matrix a, Matrix b)
         {
             if (a.Width != b.Width || a.Height != b.Height)
@@ -248,6 +358,13 @@ namespace P09THREAD
 
             return true;
         }
+
+        /// <summary>
+        /// Multiplies two matrices in single thread mode
+        /// </summary>
+        /// <param name="a">First matrix</param>
+        /// <param name="b">Second matrix</param>
+        /// <returns>Multiplication result</returns>
         static public Matrix Mult(Matrix a, Matrix b)
         {
             if (a.Width != b.Height)
@@ -266,6 +383,14 @@ namespace P09THREAD
 
             return c;
         }
+
+        /// <summary>
+        /// Multiplies two matrices in multithreading mode
+        /// </summary>
+        /// <param name="a">First matrix</param>
+        /// <param name="b">Second matrix</param>
+        /// <param name="threadCount">Count of using threads</param>
+        /// <returns>Multiplication result</returns>
         static public Matrix MultThread(Matrix a, Matrix b, int threadCount)
         {
             if (threadCount < 0 || threadCount > a.Height)
@@ -315,16 +440,8 @@ namespace P09THREAD
     {
         static void Main()
         {
-            FileCleaner.ClearByFstring("matrix_{0}.txt");
-            var a = new Matrix("1.txt");
-            var b = new Matrix("2.txt");
-            var aa = new Matrix(4, 3);
-            var bb = new Matrix(3, 4);
-
-            Matrix.Mult(aa, bb).Print();
-            Matrix.MultThread(aa, bb, 8).Print();
-
-            Console.ReadKey();
+            var bench = new MultBenchmark();
+            bench.StatsTable(12, 13);
         }
     }
 }
