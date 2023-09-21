@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Desktop\\HW01THREAD\\THREAD\\THREAD.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Desktop\\HWSEMESTER03\\HW01THREAD\\THREAD\\THREAD.csproj",
       "projectName": "THREAD",
-      "projectPath": "C:\\Users\\user\\Desktop\\HW01THREAD\\THREAD\\THREAD.csproj",
+      "projectPath": "C:\\Users\\user\\Desktop\\HWSEMESTER03\\HW01THREAD\\THREAD\\THREAD.csproj",
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Desktop\\HW01THREAD\\THREAD\\obj\\",
+      "outputPath": "C:\\Users\\user\\Desktop\\HWSEMESTER03\\HW01THREAD\\THREAD\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
