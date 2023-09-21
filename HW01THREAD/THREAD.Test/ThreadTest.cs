@@ -1,29 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-
+using THREAD;
 
 namespace THREAD.Tests
 {
-    [TestClass]
-    public class MultBenchmarkTests
-    {
-        [TestMethod]
-        public void TestSingleThreadTest()
-        {
-            var a = new Matrix(200, 200);
-            var b = new Matrix(200, 200);
-
-            Assert.IsTrue(MultBenchmark.);
-        }
-
-        [TestMethod]
-        public void TestMultiThreadTest()
-        {
-
-        }
-    }
-}
-
     [TestClass]
     public class MatrixTests
     {
