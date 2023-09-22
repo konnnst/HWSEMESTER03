@@ -1,5 +1,3 @@
-
-
 namespace MultiThread;
 
 class FileCleaner
