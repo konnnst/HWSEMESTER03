@@ -35,5 +35,6 @@ static class ListStatsExtension
         var avg = numbers.Average();
         var sum = numbers.Sum(d => Math.Pow(d - avg, 2));
         return Math.Sqrt(sum / (numbers.Count() - 1));
+
     }
 }

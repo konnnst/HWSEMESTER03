@@ -2,9 +2,9 @@
 
 public class Matrix
 {
-    int[,] matrix;
-    int Width { get; set; }
-    int Height { get; set; }
+    private int[,] matrix;
+    private int Width { get; set; }
+    private int Height { get; set; }
 
     /// <summary>
     /// Creates matrix with random elements by given height and width
@@ -16,13 +16,14 @@ public class Matrix
         this.matrix = new int[h, w];
         this.Width = w; this.Height = h;
 
-        Random random = new Random();
+        var random = new Random();
         for (var i = 0; i < h; ++i)
         {
             for (var k = 0; k < w; ++k)
                 matrix[i, k] = random.Next(-5, 5);
         }
     }
+
     /// <summary>
     /// Reads matrix from given file
     /// </summary>
@@ -121,7 +122,7 @@ public class Matrix
     /// <param name="fileIndex">index in matrix file name</param>
     public void Save(int fileIndex)
     {
-        int maxIndex = 0;
+        var maxIndex = 0;
         while (File.Exists(String.Format(Constants.MatrixPath, ++maxIndex))) { }
         if (maxIndex > fileIndex)
         {
@@ -130,9 +131,9 @@ public class Matrix
         }
 
         StreamWriter writer = new StreamWriter(String.Format(Constants.MatrixPath, fileIndex));
-        for (int i = 0; i < this.Height; ++i)
+        for (var i = 0; i < this.Height; ++i)
         {
-            for (int k = 0; k < this.Width; ++k)
+            for (var k = 0; k < this.Width; ++k)
                 writer.Write(matrix[i, k] + " ");
             writer.Write("\n");
         }
