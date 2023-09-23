@@ -302,6 +302,22 @@ internal class Program
     static void Main()
     {
         var bench = new MultBenchmark();
-        bench.StatsTable(4, 6);
+
+        Console.WriteLine("Welcome to matrix multiplication benchmark");
+
+        Console.Write("Input max size of matrix in stats row: ");
+        if (Int32.TryParse(Console.ReadLine(), out int maxMatrixSize))
+        {
+            Console.Write("Input working thread count: ");
+            if (Int32.TryParse(Console.ReadLine(), out int threadCount))
+                bench.StatsTable(threadCount, maxMatrixSize);
+            else
+                Console.WriteLine("Incorrect input format, int expected");
+        }
+        else
+            Console.WriteLine("Incorrect input format, int expected");
+
+
+        Console.ReadKey();
     }
 }
