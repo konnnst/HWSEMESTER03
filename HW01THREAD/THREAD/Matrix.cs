@@ -3,8 +3,7 @@
 public class Matrix
 {
     private int[,] matrix;
-    private int Width { get; set; }
-    private int Height { get; set; }
+    private int Width, Height;
 
     /// <summary>
     /// Creates matrix with random elements by given height and width
@@ -15,7 +14,7 @@ public class Matrix
     {
         this.matrix = new int[h, w];
         this.Width = w; this.Height = h;
-
+    
         var random = new Random();
         for (var i = 0; i < h; ++i)
         {
@@ -86,24 +85,6 @@ public class Matrix
     }
 
     /// <summary>
-    /// Returns matrix width
-    /// </summary>
-    /// <returns></returns>
-    public int GetWidth()
-    {
-        return this.Width;
-    }
-
-    /// <summary>
-    /// Returns matrix height
-    /// </summary>
-    /// <returns></returns>
-    public int GetHeight()
-    {
-        return this.Height;
-    }
-
-    /// <summary>
     /// Saves matrix to file in directory, where .exe located
     /// with name "matrix_{index}.txt" with first free index
     /// </summary>
@@ -158,20 +139,20 @@ public class Matrix
     /// Multiplies two matrices taken from files and writes to file in
     /// folder with .exe
     /// </summary>
-    /// <param name="f1">First matrix file name</param>
-    /// <param name="f2">Second matix file name</param>
+    /// <param name="leftMatrixFile">First matrix file name</param>
+    /// <param name="rightMatrixFile">Second matix file name</param>
     /// <param name="threadCount">Count of threads for multiplication</param>
-    static public void FileMultThread(string f1, string f2, int threadCount)
+    static public void FileMultiThreadMultiply(string leftMatrixFile, string rightMatrixFile, int threadCount)
     {
-        if (!File.Exists(f1) || !File.Exists(f2))
+        if (!File.Exists(leftMatrixFile) || !File.Exists(rightMatrixFile))
         {
             Console.WriteLine("Files not exits");
             return;
         }
-        var a = new Matrix(f1);
-        var b = new Matrix(f2);
+        var a = new Matrix(leftMatrixFile);
+        var b = new Matrix(rightMatrixFile);
 
-        var c = MultThread(a, b, threadCount);
+        var c = MultiThreadMultiply(a, b, threadCount);
 
         c.Save();
     }
@@ -182,7 +163,7 @@ public class Matrix
     /// </summary>
     /// <param name="f1">First matrix</param>
     /// <param name="f2">Second matrix</param>
-    static public void FileMult(string f1, string f2)
+    static public void FileMultilply(string f1, string f2)
     {
         if (!File.Exists(f1) || !File.Exists(f2))
         {
@@ -192,7 +173,7 @@ public class Matrix
         var a = new Matrix(f1);
         var b = new Matrix(f2);
 
-        var c = Mult(a, b);
+        var c = Multiply(a, b);
 
         c.Save();
     }
@@ -200,19 +181,23 @@ public class Matrix
     /// <summary>
     /// Checks if two matrices equal
     /// </summary>
-    /// <param name="a">First matrix</param>
-    /// <param name="b">Second matrix</param>
+    /// <param name="leftMatrix">First matrix</param>
+    /// <param name="rightMatrix">Second matrix</param>
     /// <returns>True if equal, else false</returns>
-    static public bool Compare(Matrix a, Matrix b)
+    static public bool Compare(Matrix leftMatrix, Matrix rightMatrix)
     {
-        if (a.Width != b.Width || a.Height != b.Height)
+        if ((leftMatrix == null && rightMatrix == null) ||
+            System.Object.ReferenceEquals(leftMatrix, rightMatrix))
+            return true;
+        if (leftMatrix == null || rightMatrix == null || leftMatrix.Width != rightMatrix.Width ||
+            leftMatrix.Height != rightMatrix.Height)
             return false;
 
-        for (var i = 0; i < a.Height; ++i)
+        for (var i = 0; i < leftMatrix.Height; ++i)
         {
-            for (var j = 0; j < a.Width; ++j)
+            for (var j = 0; j < leftMatrix.Width; ++j)
             {
-                if (a.matrix[i, j] != b.matrix[i, j])
+                if (leftMatrix.matrix[i, j] != rightMatrix.matrix[i, j])
                     return false;
             }
         }
@@ -223,23 +208,20 @@ public class Matrix
     /// <summary>
     /// Multiplies two matrices in single thread mode
     /// </summary>
-    /// <param name="a">First matrix</param>
-    /// <param name="b">Second matrix</param>
+    /// <param name="leftMatrix">First matrix</param>
+    /// <param name="rightMatrix">Second matrix</param>
     /// <returns>Multiplication result</returns>
-    static public Matrix Mult(Matrix a, Matrix b)
+    static public Matrix Multiply(Matrix leftMatrix, Matrix rightMatrix)
     {
-        if (a.Width != b.Height)
+        if (leftMatrix.Width != rightMatrix.Height)
             return null;
-        var c = new Matrix(a.Height, b.Width);
+        var resultMatrix = new Matrix(leftMatrix.Height, rightMatrix.Width);
 
-        for (var i = 0; i < a.Height; ++i)
+        for (var i = 0; i < leftMatrix.Height; ++i)
         {
-            for (var j = 0; j < b.Width; ++j)
-            {
-                c.matrix[i, j] = 0;
-                for (var k = 0; k < b.Height; ++k)
-                    c.matrix[i, j] += a.matrix[i, k] * b.matrix[k, j];
-            }
+            for (var j = 0; j < rightMatrix.Width; ++j)
+                resultMatrix.matrix[i, j] = Enumerable.Range(0,rightMatrix.Height).Sum(k
+                    => leftMatrix.matrix[i, k] * rightMatrix.matrix[k, j]);
         }
 
         return c;
@@ -248,40 +230,36 @@ public class Matrix
     /// <summary>
     /// Multiplies two matrices in multithreading mode
     /// </summary>
-    /// <param name="a">First matrix</param>
-    /// <param name="b">Second matrix</param>
+    /// <param name="leftMatrix">First matrix</param>
+    /// <param name="rightMatrix">Second matrix</param>
     /// <param name="threadCount">Count of using threads</param>
     /// <returns>Multiplication result</returns>
-    static public Matrix MultThread(Matrix a, Matrix b, int threadCount)
+    static public Matrix MultiThreadMultiply(Matrix leftMatrix, Matrix rightMatrix, int threadCount)
     {
-        if (threadCount < 0 || threadCount > a.Height)
+        if (threadCount < 0 || threadCount > leftMatrix.Height || threadCount > Environment.ProcessorCount)
         {
             Console.WriteLine("Thread count clipped according to matrix size");
-            threadCount = a.Height;
+            threadCount = Math.Min(leftMatrix.Height, Environment.ProcessorCount);
         }
-        if (a.Width != b.Height)
+        if (leftMatrix.Width != rightMatrix.Height)
         {
             Console.WriteLine("Incorrect matrix sizes");
             return null;
         }
 
-        var c = new Matrix(a.Height, b.Width);
+        var resultMatrix = new Matrix(leftMatrix.Height, rightMatrix.Width);
         var threads = new Thread[threadCount];
-        var threadPiece = a.Height / threadCount + Convert.ToInt32(a.Height % threadCount != 0);
+        var threadPiece = Convert.ToInt32(Math.Ceiling((Convert.ToDouble(leftMatrix.Height) / threadCount)));
 
         for (var i = 0; i < threadCount; ++i)
         {
             var localI = i;
             threads[i] = new Thread(() =>
             {
-                for (var n = threadPiece * localI; n < threadPiece * (localI + 1) && n < a.Height; ++n)
+                for (var n = threadPiece * localI; n < threadPiece * (localI + 1) && n < leftMatrix.Height; ++n)
                 {
-                    for (var j = 0; j < b.Width; ++j)
-                    {
-                        c.matrix[n, j] = 0;
-                        for (var k = 0; k < a.Width; ++k)
-                            c.matrix[n, j] += a.matrix[n, k] * b.matrix[k, j];
-                    }
+                    for (var j = 0; j < rightMatrix.Width; ++j)
+                        resultMatrix.matrix[n, j] = Enumerable.Range(0, leftMatrix.Width).Sum(k => leftMatrix.matrix[n, k] * rightMatrix.matrix[k, j]);
                 }
             });
 
@@ -293,7 +271,7 @@ public class Matrix
         for (var i = 0; i < threads.Length; ++i)
             threads[i].Join();
 
-        return c;
+        return resultMatrix;
     }
 }
 
@@ -302,6 +280,8 @@ internal class Program
     static void Main()
     {
         var bench = new MultBenchmark();
+
+        Console.WriteLine(Environment.ProcessorCount);
 
         Console.WriteLine("Welcome to matrix multiplication benchmark");
 
@@ -317,6 +297,7 @@ internal class Program
         else
             Console.WriteLine("Incorrect input format, int expected");
 
+        var a = new Matrix(4, 5);
 
         Console.ReadKey();
     }

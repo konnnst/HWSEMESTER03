@@ -17,13 +17,13 @@ namespace MultiThread.Tests
         [TestMethod]
         public void MultTest()
         {
-            Assert.IsTrue(Matrix.Compare(Matrix.Mult(LeftMatrix, RightMatrix), ResultMatrix));
+            Assert.IsTrue(Matrix.Compare(Matrix.Multiply(LeftMatrix, RightMatrix), ResultMatrix));
         }
 
         [TestMethod]
         public void MultThreadTest()
         {
-            Assert.IsTrue(Matrix.Compare(Matrix.MultThread(LeftMatrix, RightMatrix, 8), ResultMatrix));
+            Assert.IsTrue(Matrix.Compare(Matrix.MultiThreadMultiply(LeftMatrix, RightMatrix, 8), ResultMatrix));
         }
 
         [TestMethod]
@@ -40,11 +40,11 @@ namespace MultiThread.Tests
             var left5 = new Matrix(1, 1);
             var right5 = new Matrix(1, 1);
 
-            Assert.IsTrue(Matrix.Compare(Matrix.Mult(left1, right1), Matrix.MultThread(left1, right1, 8)));
-            Assert.IsTrue(Matrix.Compare(Matrix.Mult(left2, right2), Matrix.MultThread(left2, right2, 8)));
-            Assert.IsTrue(Matrix.Compare(Matrix.Mult(left3, right3), Matrix.MultThread(left3, right3, 8)));
-            Assert.IsTrue(Matrix.Compare(Matrix.Mult(left4, right4), Matrix.MultThread(left4, right4, 8)));
-            Assert.IsTrue(Matrix.Compare(Matrix.Mult(left5, right5), Matrix.MultThread(left5, right5, 8)));
+            Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left1, right1), Matrix.MultiThreadMultiply(left1, right1, 8)));
+            Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left2, right2), Matrix.MultiThreadMultiply(left2, right2, 8)));
+            Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left3, right3), Matrix.MultiThreadMultiply(left3, right3, 8)));
+            Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left4, right4), Matrix.MultiThreadMultiply(left4, right4, 8)));
+            Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left5, right5), Matrix.MultiThreadMultiply(left5, right5, 8)));
         }
     }
 }

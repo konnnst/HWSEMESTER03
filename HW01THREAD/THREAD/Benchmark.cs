@@ -28,10 +28,10 @@ class MultBenchmark
             var multi = new List<double>();
             for (var i = 0; i < 8; ++i)
             {
-                var a = new Matrix(size, size);
-                var b = new Matrix(size, size);
-                single.Add(TestSingleThread(a, b));
-                multi.Add(TestMultiThread(a, b, threadCount));
+                var leftMatrix = new Matrix(size, size);
+                var rightMatrix = new Matrix(size, size);
+                single.Add(TestSingleThread(leftMatrix, rightMatrix));
+                multi.Add(TestMultiThread(leftMatrix, rightMatrix, threadCount));
             }
             result.WriteLine("|Single|{0}|{1} ms|{2} ms|{3} ms||",
                 size, single.Average(), single.Median(), single.StandardDeviation());
@@ -43,22 +43,22 @@ class MultBenchmark
 
         result.Close();
     }
-    private double TestSingleThread(Matrix a, Matrix b)
+    private double TestSingleThread(Matrix leftMatrix, Matrix rightMatrix)
     {
         var timer = new Stopwatch();
 
         timer.Start();
-        Matrix.Mult(a, b);
+        Matrix.Multiply(leftMatrix, rightMatrix);
         timer.Stop();
 
         return Convert.ToDouble(timer.ElapsedMilliseconds);
     }
-    private double TestMultiThread(Matrix a, Matrix b, int threadCount)
+    private double TestMultiThread(Matrix leftMatrix, Matrix rightMatrix, int threadCount)
     {
         var timer = new Stopwatch();
 
         timer.Start();
-        Matrix.MultThread(a, b, threadCount);
+        Matrix.MultiThreadMultiply(leftMatrix, rightMatrix, threadCount);
         timer.Stop();
 
         return Convert.ToDouble(timer.ElapsedMilliseconds);
