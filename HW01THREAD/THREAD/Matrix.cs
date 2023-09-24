@@ -224,7 +224,7 @@ public class Matrix
                     => leftMatrix.matrix[i, k] * rightMatrix.matrix[k, j]);
         }
 
-        return c;
+        return resultMatrix;
     }
 
     /// <summary>
