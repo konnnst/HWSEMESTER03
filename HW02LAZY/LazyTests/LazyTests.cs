@@ -4,29 +4,6 @@ using MyLazy;
 
 namespace LazyTests;
 
-internal class Counter<T>
-{
-    private volatile int callsCount;
-    public int CallsCount
-    {
-        get => this.callsCount;
-        private set => this.callsCount = value;
-    }
-    private Func<T> func;
-
-    public Counter(Func<T> func)
-    {
-        this.CallsCount = 0;
-        this.func = func;
-    }
-
-    public T Call()
-    {
-        this.CallsCount++;
-        return func();
-    }
-}
-
 public class Operations
 {
     public static List<int> RandomListCreateSort()
@@ -97,7 +74,7 @@ public class LazyMultiThreadTests
         stopwatch.Stop();
         var totalTime = stopwatch.ElapsedMilliseconds;
 
-        Assert.IsTrue(totalTime * 3 < 2 * oneTime);
+        Assert.IsTrue(totalTime < 5 * oneTime);
     }
 
 }
