@@ -1,6 +1,6 @@
 namespace MultiThread;
 
-class FileCleaner
+public class FileCleaner
 {
     /// <summary>
     /// Clears files in .exe directory by format string with one iterator 
@@ -11,10 +11,10 @@ class FileCleaner
     {
         var iterator = 0;
 
-        while (!File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}") && iterator < 100)
+        while (!File.Exists($"{MyConstants.CurrentFolder}\\{String.Format(fString, iterator)}") && iterator < 100)
             ++iterator;
 
-        while (File.Exists($"{Constants.CurrentFolder}\\{String.Format(fString, iterator)}")) ;
+        while (File.Exists($"{MyConstants.CurrentFolder}\\{String.Format(fString, iterator)}")) ;
         File.Delete(String.Format(fString, iterator++));
     }
 }

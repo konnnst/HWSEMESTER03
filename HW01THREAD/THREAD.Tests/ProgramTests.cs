@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MultiThread;
 
@@ -45,6 +46,48 @@ namespace MultiThread.Tests
             Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left3, right3), Matrix.MultiThreadMultiply(left3, right3, 8)));
             Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left4, right4), Matrix.MultiThreadMultiply(left4, right4, 8)));
             Assert.IsTrue(Matrix.Compare(Matrix.Multiply(left5, right5), Matrix.MultiThreadMultiply(left5, right5, 8)));
+        }
+
+        [TestMethod]
+        public void NullConstructorTest()
+        {
+            var nullHeightMatrix = new Matrix(0, 5);
+            var nullWidthMatrix = new Matrix(5, 0);
+
+            Assert.IsTrue(nullHeightMatrix.IsNull());
+            Assert.IsTrue(nullWidthMatrix.IsNull());
+        }
+
+        [TestMethod]
+        public void NullMultiplicationTest()
+        {
+            var nullHeightMatrix = new Matrix(0, 5);
+            var notNullMatrix = new Matrix(5, 5);
+            var nullWidthMatrix = new Matrix(5, 0);
+
+            var notNullSingleThread = Matrix.Multiply(notNullMatrix, notNullMatrix);
+            var notNullMultiThread = Matrix.MultiThreadMultiply(notNullMatrix, notNullMatrix, 4);
+
+            var nullHeightSingleThread = Matrix.Multiply(nullHeightMatrix, notNullMatrix);
+            var nullHeightMultiThread = Matrix.MultiThreadMultiply(nullHeightMatrix, notNullMatrix, 4);
+
+            var nullWidthSingleThread = Matrix.Multiply(notNullMatrix, nullHeightMatrix);
+            var nullWidthMultiThread = Matrix.MultiThreadMultiply(notNullMatrix, nullWidthMatrix, 4);
+
+            var nullBothSingleThread = Matrix.Multiply(nullHeightMatrix, nullWidthMatrix);
+            var nullBothMultiThread = Matrix.MultiThreadMultiply(nullHeightMatrix, nullWidthMatrix, 4);
+
+            Assert.IsFalse(notNullSingleThread.IsNull());
+            Assert.IsFalse(notNullMultiThread.IsNull());
+
+            Assert.IsTrue(nullHeightSingleThread.IsNull());
+            Assert.IsTrue(nullHeightMultiThread.IsNull());
+
+            Assert.IsTrue(nullWidthSingleThread.IsNull());
+            Assert.IsTrue(nullWidthMultiThread.IsNull());
+
+            Assert.IsTrue(nullBothSingleThread.IsNull());
+            Assert.IsTrue(nullBothMultiThread.IsNull());
         }
     }
 }

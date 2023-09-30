@@ -12,8 +12,17 @@ public class Matrix
     /// <param name="w">Matrix width</param>
     public Matrix(int h, int w)
     {
+        if (h == 0 || w == 0)
+        {
+            this.Width = 0;
+            this.Height = 0;
+            this.matrix = new int[0, 0];
+            return;
+        }
+
         this.matrix = new int[h, w];
-        this.Width = w; this.Height = h;
+        this.Width =    w;
+        this.Height = h;
     
         var random = new Random();
         for (var i = 0; i < h; ++i)
@@ -30,24 +39,28 @@ public class Matrix
     /// <exception cref="FormatException"></exception>
     public Matrix(string fileName)
     {
-        if (!File.Exists(Constants.CurrentFolder + fileName))
+        if (!File.Exists(MyConstants.CurrentFolder + fileName))
         {
             Console.WriteLine("File not exists");
+            this.matrix = new int[0, 0];
+            this.Height = 0;
+            this.Width = 0;
             return;
         }
-        StreamReader reader = new StreamReader(Constants.CurrentFolder + fileName);
-        int w;
-        string line;
+        StreamReader reader = new StreamReader(MyConstants.CurrentFolder + fileName);
+
+        string? line;
         var matrix = new List<int[]>();
 
         if ((line = reader.ReadLine()) == null)
         {
-            this.Height = 0; this.Width = 0;
+            this.Height = 0;
+            this.Width = 0;
             this.matrix = new int[0, 0];
             return;
         }
 
-        w = line.Split().Length;
+        var w = line.Split().Length;
 
         while (line != null)
         {
@@ -63,7 +76,8 @@ public class Matrix
             matrix.Add(row);
             line = reader.ReadLine();
         }
-        this.Height = matrix.Count; this.Width = w;
+        this.Height = matrix.Count;
+        this.Width = w;
         this.matrix = new int[this.Height, this.Width];
 
         for (int i = 0; i < this.Height; ++i)
@@ -91,7 +105,7 @@ public class Matrix
     public void Save()
     {
         var i = -1;
-        while (File.Exists(String.Format(Constants.MatrixPath, ++i))) { }
+        while (File.Exists(String.Format(MyConstants.MatrixPath, ++i))) { }
         this.Save(i);
     }
 
@@ -103,22 +117,21 @@ public class Matrix
     /// <param name="fileIndex">index in matrix file name</param>
     public void Save(int fileIndex)
     {
-        var maxIndex = 0;
-        while (File.Exists(String.Format(Constants.MatrixPath, ++maxIndex))) { }
+        var maxIndex = -1;
+        while (File.Exists(String.Format(MyConstants.MatrixPath, ++maxIndex))) { }
         if (maxIndex > fileIndex)
         {
             Console.WriteLine("File with this index already exists");
             return;
         }
 
-        StreamWriter writer = new StreamWriter(String.Format(Constants.MatrixPath, fileIndex));
+        StreamWriter writer = new StreamWriter(String.Format(MyConstants.MatrixPath, fileIndex));
         for (var i = 0; i < this.Height; ++i)
         {
             for (var k = 0; k < this.Width; ++k)
                 writer.Write(matrix[i, k] + " ");
             writer.Write("\n");
         }
-        writer.Write("{0} {1}", this.Height, this.Width);
         writer.Close();
     }
 
@@ -127,6 +140,8 @@ public class Matrix
     /// </summary>
     public void Print()
     {
+        if (this.Width == 0)
+            Console.WriteLine("Empty matrix");
         for (var i = 0; i < this.Height; ++i)
         {
             for (var k = 0; k < this.Width; ++k)
@@ -186,11 +201,11 @@ public class Matrix
     /// <returns>True if equal, else false</returns>
     static public bool Compare(Matrix leftMatrix, Matrix rightMatrix)
     {
-        if ((leftMatrix == null && rightMatrix == null) ||
-            System.Object.ReferenceEquals(leftMatrix, rightMatrix))
+        if (System.Object.ReferenceEquals(leftMatrix, rightMatrix))
             return true;
-        if (leftMatrix == null || rightMatrix == null || leftMatrix.Width != rightMatrix.Width ||
-            leftMatrix.Height != rightMatrix.Height)
+        if (leftMatrix.Width != rightMatrix.Width ||
+            leftMatrix.Height != rightMatrix.Height ||
+            rightMatrix.IsNull() || leftMatrix.IsNull())
             return false;
 
         for (var i = 0; i < leftMatrix.Height; ++i)
@@ -214,8 +229,12 @@ public class Matrix
     static public Matrix Multiply(Matrix leftMatrix, Matrix rightMatrix)
     {
         if (leftMatrix.Width != rightMatrix.Height)
-            return null;
+            return new Matrix(0, 0);
+
         var resultMatrix = new Matrix(leftMatrix.Height, rightMatrix.Width);
+
+        if (resultMatrix.IsNull())
+            return resultMatrix;
 
         for (var i = 0; i < leftMatrix.Height; ++i)
         {
@@ -239,17 +258,17 @@ public class Matrix
         if (threadCount < 0 || threadCount > leftMatrix.Height || threadCount > Environment.ProcessorCount)
         {
             Console.WriteLine("Thread count clipped according to matrix size");
-            threadCount = Math.Min(leftMatrix.Height, Environment.ProcessorCount);
+            threadCount = Math.Max(Math.Min(leftMatrix.Height, Environment.ProcessorCount), 1);
         }
         if (leftMatrix.Width != rightMatrix.Height)
-        {
-            Console.WriteLine("Incorrect matrix sizes");
-            return null;
-        }
+            return new Matrix(0, 0);
 
         var resultMatrix = new Matrix(leftMatrix.Height, rightMatrix.Width);
         var threads = new Thread[threadCount];
         var threadPiece = Convert.ToInt32(Math.Ceiling((Convert.ToDouble(leftMatrix.Height) / threadCount)));
+
+        if (resultMatrix.IsNull())
+            return resultMatrix;
 
         for (var i = 0; i < threadCount; ++i)
         {
@@ -262,7 +281,6 @@ public class Matrix
                         resultMatrix.matrix[n, j] = Enumerable.Range(0, leftMatrix.Width).Sum(k => leftMatrix.matrix[n, k] * rightMatrix.matrix[k, j]);
                 }
             });
-
         }
 
         for (var i = 0; i < threads.Length; ++i)
@@ -273,14 +291,24 @@ public class Matrix
 
         return resultMatrix;
     }
+
+    public bool IsNull()
+    {
+        if (this.Height != 0 || this.Width != 0)
+            return false;
+        return true;
+    }
 }
 
 internal class Program
 {
     static void Main()
-    {
-        var bench = new MultBenchmark();
+    {   
+        var a = new Matrix(5, 5);
+        a.Save();
+       /* var bench = new MultBenchmark();
 
+        Console.WriteLine(MyConstants.MatrixPath);
         Console.WriteLine(Environment.ProcessorCount);
 
         Console.WriteLine("Welcome to matrix multiplication benchmark");
@@ -297,8 +325,6 @@ internal class Program
         else
             Console.WriteLine("Incorrect input format, int expected");
 
-        var a = new Matrix(4, 5);
-
-        Console.ReadKey();
+        Console.ReadKey();*/
     }
 }

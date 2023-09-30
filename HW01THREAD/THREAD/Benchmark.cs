@@ -18,7 +18,7 @@ class MultBenchmark
     /// <param name="sizeLogMax">Log_2 of max size matrix if stats row</param>
     public void StatsTable(int threadCount, int sizeLogMax)
     {
-        var result = new StreamWriter(Constants.ResultPath);
+        var result = new StreamWriter(MyConstants.ResultPath);
         result.WriteLine("Executed on Asus D509D (AMD Ryzen 3 3200U, 2 core, 4 threads)");
         result.WriteLine("|Mode|Size|Mean|Median|St.dev.|Boost|");
         result.WriteLine("|-|-|-|-|-|-|");
