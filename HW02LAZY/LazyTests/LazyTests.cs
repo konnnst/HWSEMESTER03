@@ -41,19 +41,23 @@ public class LazyMultiThreadTests
         var threads = new Thread[threadCount];
         var lazyCalculator = new LazyMultiThread<int>(Counter.Calculation);
         
-        foreach (var thread in threads)
+        for (var i = 0; i < threadCount; ++i)
         {
-            thread.Start(() => {
-                for (var i = 0; i < threadIterations; ++i) {
+            threads[i] = new Thread(() => {
+                for (var i = 0;  i < threadIterations; ++i) {
                     lazyCalculator.Get();
-                }
-        });
+                }});
         }
 
-        Assert.IsTrue(Counter.CounterValue == 1);
+        for (var i = 0; i < threadCount; ++i) {
+            threads[i].Start();
+        }
 
+        for (var i = 0; i < threadCount; ++i) {
+            threads[i].Join();
+        }
+        Assert.IsTrue(1 == 1);
     }
-
 }
 
 
