@@ -56,7 +56,7 @@ public class LazyMultiThreadTests
         for (var i = 0; i < threadCount; ++i) {
             threads[i].Join();
         }
-        Assert.IsTrue(1 == 1);
+        Assert.IsTrue(Counter.CounterValue == 1);
     }
 }
 
