@@ -4,43 +4,29 @@ using MyLazy;
 
 namespace LazyTests;
 
-public class Operations
+public class Counter
 {
-    public static List<int> RandomListCreateSort()
+    private static int _counterValue = 0;
+    public static int CounterValue => _counterValue;
+    public static int Calculation()
     {
-        var l = new List<int>();
-        var size = 1000000;
-
-        var random = new Random();
-        for (int i = 0; i < size; ++i)
-            l.Add(random.Next());
-
-        return l;
+        return ++_counterValue;
     }
 }
 
 [TestClass]
 public class LazySingleThreadTests
 {
-    private int GetExecutionTIme<T>(Func<T> function)
-    {
-        var time = new Stopwatch();
-
-        time.Start();
-        function();
-        
-        return (int)time.ElapsedMilliseconds;
-    }
-
     [TestMethod]
     public void GetTest()
     {
-        var lazy = new LazySingleThread<List<int>>(Operations.RandomListCreateSort);
-        var iterationCount = 20;
-        var firstExecutionTime = GetExecutionTIme<List<int>>(lazy.Get);
+        var iterations = 20;
+        var lazyCalculator = new LazySingleThread<int>(Counter.Calculation);
 
-        for (int i = 0; i < iterationCount; ++i)
-            Assert.IsTrue(firstExecutionTime > GetExecutionTIme<List<int>>(lazy.Get) * 20);
+        for (var i = 0; i < iterations; ++i)
+            lazyCalculator.Get();
+        
+        Assert.IsTrue(Counter.CounterValue == 1);
     }
 }
 
@@ -50,31 +36,22 @@ public class LazyMultiThreadTests
     [TestMethod]
     public void GetTest()
     {
-        var lazy = new LazyMultiThread<List<int>>(Operations.RandomListCreateSort);
-        var threadCount = Environment.ProcessorCount;
+        var threadCount = 20;
+        var threadIterations = 10;
         var threads = new Thread[threadCount];
-        var stopwatch = new Stopwatch();
-        var lazyControl = new LazySingleThread<List<int>>(Operations.RandomListCreateSort);
+        var lazyCalculator = new LazyMultiThread<int>(Counter.Calculation);
+        
+        foreach (var thread in threads)
+        {
+            thread.Start(() => {
+                for (var i = 0; i < threadIterations; ++i) {
+                    lazyCalculator.Get();
+                }
+        });
+        }
 
-        stopwatch.Start();
-        lazyControl.Get();
-        stopwatch.Stop();
-        var oneTime = stopwatch.ElapsedMilliseconds;
-        stopwatch.Reset();
+        Assert.IsTrue(Counter.CounterValue == 1);
 
-        stopwatch.Start();
-        for (int i = 0; i < threadCount; ++i)
-            threads[i] = new Thread(() => lazy.Get());
-
-        for (int i = 0; i < threadCount; ++i)
-            threads[i].Start();
-
-        for (int i = 0; i < threadCount; ++i)
-            threads[i].Join();
-        stopwatch.Stop();
-        var totalTime = stopwatch.ElapsedMilliseconds;
-
-        Assert.IsTrue(totalTime < 5 * oneTime);
     }
 
 }

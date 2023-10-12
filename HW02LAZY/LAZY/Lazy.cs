@@ -2,7 +2,9 @@
 
 namespace MyLazy;
 
-public interface ILazy<T> { T? Get(); }
+public interface ILazy<T> {
+    T? Get();
+ }
 
 /// <summary>
 /// Thread non-safe realisation of built-in Lazy class
@@ -10,9 +12,9 @@ public interface ILazy<T> { T? Get(); }
 /// <typeparam name="T">Type of supplier function returning value</typeparam>
 public class LazySingleThread<T> : ILazy<T>
 {
-    private bool IsCalculated = false;
-    private T? Result;
-    private Func<T> Supplier;
+    private bool _isCalculated = false;
+    private T? _result;
+    private Func<T> _supplier;
 
     /// <summary>
     /// Creates object of this class
@@ -20,7 +22,7 @@ public class LazySingleThread<T> : ILazy<T>
     /// <param name="supplier">Function, providing calculation</param>
     public LazySingleThread(Func<T> supplier)
     {
-        Supplier = supplier;
+        _supplier = supplier;
     }
 
     /// <summary>
@@ -30,10 +32,11 @@ public class LazySingleThread<T> : ILazy<T>
     /// <returns>Result of running supplier function</returns>
     public T? Get()
     {
-        if (!IsCalculated)
-            Result = Supplier();
-        IsCalculated = true;
-        return Result;
+        if (!_isCalculated) {
+            _result = _supplier();
+        }
+        _isCalculated = true;
+        return _result;
     }
 }
 
@@ -43,10 +46,10 @@ public class LazySingleThread<T> : ILazy<T>
 /// <typeparam name="T">Type of supplier function returning value</typeparam>
 public class LazyMultiThread<T> : ILazy<T>
 {
-    private Object lockObject = new();
-    private bool IsCalculated = false;
-    private T? Result;
-    private Func<T> Supplier;
+    private Object _lockObject = new();
+    private bool _isCalculated = false;
+    private T? _result;
+    private Func<T> _supplier;
 
     /// <summary>
     /// Creates object of this class
@@ -54,7 +57,7 @@ public class LazyMultiThread<T> : ILazy<T>
     /// <param name="supplier">Function, providing calculation</param>
     public LazyMultiThread(Func<T> supplier)
     {
-        Supplier = supplier;
+        _supplier = supplier;
     }
 
     /// <summary>
@@ -64,16 +67,17 @@ public class LazyMultiThread<T> : ILazy<T>
     /// <returns>Result of running supplier function</returns>
     public T? Get()
     {
-        if (IsCalculated)
-            return Result;
+        if (Volatile.Read(ref _isCalculated)) {
+            return _result;
+        }
 
-        lock (lockObject)
+        lock (_lockObject)
         {
-            if (Volatile.Read(ref IsCalculated))
-                return Result;
-            Result = Supplier();
-            Volatile.Write(ref IsCalculated, true);
-            return Result;
+            if (Volatile.Read(ref _isCalculated))
+                return _result;
+            _result = _supplier();
+            Volatile.Write(ref _isCalculated, true);
+            return _result;
         }
     }
 }
