@@ -4,6 +4,10 @@ using MyLazy;
 
 namespace LazyTests;
 
+
+/// <summary>
+/// Counts calculation attempts from all working threads
+/// </summary>
 public class Counter
 {
     private int _counterValue = 0;
@@ -59,10 +63,6 @@ public class LazyMultiThreadTests
         for (var i = 0; i < threadCount; ++i) {
             threads[i].Join();
         }
-
-        var writer = new StreamWriter("/home/konnnst/Desktop/res");
-        writer.Write(counter.CounterValue);
-        writer.Close();
 
         Assert.IsTrue(lazyCalculator.Get() == 1);
         Assert.IsTrue(counter.CounterValue == 1);
