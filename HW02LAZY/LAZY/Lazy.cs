@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
+
 namespace MyLazy;
 
 public interface ILazy<T> {
@@ -82,42 +83,18 @@ public class LazyMultiThread<T> : ILazy<T>
     }
 }
 
+public class Counter
+{
+    private static int _counterValue = 0;
+    public static int CounterValue => _counterValue;
+    public static int Calculation()
+    {
+        return ++_counterValue;
+    }
+}
 internal class MyLazy
 {
-    static List<int> GenerateList()
-    {
-        var l = new List<int>();
-        var randomizer = new Random();
-
-        for (int i = 0; i < 10000000; ++i)
-            l.Add(randomizer.Next(i));
-        l.Sort();
-
-        return l;
-    }
-
     static void Main()
     {
-        var n = 5;
-        var threads = new Thread[n];
-        var lazy = new LazyMultiThread<List<int>>(GenerateList);
-
-        for (int i = 0; i < n; ++i)
-        {
-            threads[i] = new Thread(() => {
-                var l = lazy.Get();
-                Console.WriteLine("Now in {0} thread", Thread.CurrentThread.Name);
-                });
-        }
-
-        for (int i = 0; i < n; ++i)
-            threads[i].Start();
-
-        for (int i = 0; i < n; ++i)
-            threads[i].Join();
-
-        Console.ReadKey();
-    }
-
-
+    }   
 }

@@ -6,9 +6,9 @@ namespace LazyTests;
 
 public class Counter
 {
-    private static int _counterValue = 0;
-    public static int CounterValue => _counterValue;
-    public static int Calculation()
+    private int _counterValue = 0;
+    public int CounterValue => _counterValue;
+    public int Calculation()
     {
         return ++_counterValue;
     }
@@ -20,13 +20,15 @@ public class LazySingleThreadTests
     [TestMethod]
     public void GetTest()
     {
+        var counter = new Counter();
         var iterations = 20;
-        var lazyCalculator = new LazySingleThread<int>(Counter.Calculation);
+        var lazyCalculator = new LazySingleThread<int>(counter.Calculation);
 
         for (var i = 0; i < iterations; ++i)
             lazyCalculator.Get();
-        
-        Assert.IsTrue(Counter.CounterValue == 1);
+
+        Assert.IsTrue(lazyCalculator.Get() == 1);        
+        Assert.IsTrue(counter.CounterValue == 1);
     }
 }
 
@@ -37,9 +39,10 @@ public class LazyMultiThreadTests
     public void GetTest()
     {
         var threadCount = 20;
-        var threadIterations = 10;
+        var threadIterations = 20;
         var threads = new Thread[threadCount];
-        var lazyCalculator = new LazyMultiThread<int>(Counter.Calculation);
+        var counter = new Counter();
+        var lazyCalculator = new LazyMultiThread<int>(counter.Calculation);
         
         for (var i = 0; i < threadCount; ++i)
         {
@@ -56,7 +59,13 @@ public class LazyMultiThreadTests
         for (var i = 0; i < threadCount; ++i) {
             threads[i].Join();
         }
-        Assert.IsTrue(Counter.CounterValue == 1);
+
+        var writer = new StreamWriter("/home/konnnst/Desktop/res");
+        writer.Write(counter.CounterValue);
+        writer.Close();
+
+        Assert.IsTrue(lazyCalculator.Get() == 1);
+        Assert.IsTrue(counter.CounterValue == 1);
     }
 }
 
