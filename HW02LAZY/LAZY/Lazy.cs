@@ -34,7 +34,14 @@ public class LazySingleThread<T> : ILazy<T>
     public T? Get()
     {
         if (!_isCalculated) {
-            _result = _supplier();
+            try
+            {
+                _result = _supplier();
+            }
+            catch
+            {
+                _result = default(T);
+            }
         }
         _isCalculated = true;
         return _result;
@@ -76,8 +83,17 @@ public class LazyMultiThread<T> : ILazy<T>
         {
             if (Volatile.Read(ref _isCalculated))
                 return _result;
-            _result = _supplier();
-            Volatile.Write(ref _isCalculated, true);
+
+            try
+            {
+                _result = _supplier();
+                Volatile.Write(ref _isCalculated, true);
+            }
+            catch
+            {
+                _result = default(T);
+            }
+            
             return _result;
         }
     }
