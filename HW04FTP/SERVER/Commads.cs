@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Client;
+namespace Server;
 
 public class Commands
 {
@@ -54,29 +51,4 @@ public class Commands
 
         return response;
     }
-}
-
-public class ClientTerminal
-{
-    public void RunClient()
-    {
-        var parser = new Parser();
-        var run = 1;
-        while (run == 1)
-        {
-            Console.Write("simple_ftp > ");
-            var command = Console.ReadLine();
-            Console.WriteLine(command);
-        }
-    }
-}
-
-internal class MyClient
-{
-    static void Main()
-    {
-        var client = new ClientNetwork();
-        client.SendMessage();
-        Console.ReadKey();
-    } 
 }
