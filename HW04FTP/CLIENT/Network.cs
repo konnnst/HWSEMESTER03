@@ -1,27 +1,53 @@
 using System.Net.Sockets;
 
+namespace Client;
 public class ClientNetwork
 {
     private int _port;
+    private string _address;
 
     public ClientNetwork()
-    {   
+    {
         _port = 1488;
+        _address = "localhost";
     }
+
+    public ClientNetwork(string address)
+    {
+        _port = 1488;
+        _address = address;
+    }
+
     public ClientNetwork(int port)
     {
         _port = port;
+        _address = "localhost";
     }
 
-    public void SendMessage()
+    public ClientNetwork(int port, string address)
     {
-        using (var client = new TcpClient("localhost", _port))
+        _port = port;
+        _address = address;
+    }   
+
+    public void SendCommands()
+    {
+        using (var client = new TcpClient(_address, _port))
         {
             var stream = client.GetStream();
+            var reader = new StreamReader(stream);
             var writer = new StreamWriter(stream);
 
-            writer.Write("Hello server");
-            writer.Flush();
+            while (true)
+            {
+                Console.Write("simple-ftp > ");
+                var query = Console.ReadLine();
+                writer.WriteLine(query);
+                writer.Flush();
+
+                var response = reader.ReadLine();
+                Console.WriteLine(response);
+            }
         }
     }
 }

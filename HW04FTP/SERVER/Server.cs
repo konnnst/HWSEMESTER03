@@ -7,7 +7,7 @@ public class MyServer
     static void Main()
     {
         var server = new ServerNetwork();
-        server.ProcessMessages();
+        server.RespondCommands();
         Console.ReadKey();
     }
 }

@@ -1,6 +1,6 @@
 namespace Server;
 
-public class Commands
+public static class Commands
 {
     public static string Get(string path)
     {
@@ -8,13 +8,13 @@ public class Commands
 
         if (!File.Exists(path))
         {
-            response = "-1\n";
+            response = "-1";
         }
         else
         {
             var file = new FileInfo(path);
 
-            response += $"{file.Length}\n";
+            response += $"{file.Length} ";
             foreach (var bytePiece in File.ReadAllBytes(path))
             {
                 response += $"{bytePiece} ";
@@ -29,23 +29,23 @@ public class Commands
         var response = "";
         if (!Directory.Exists(path))
         {
-            response = "-1\n";
+            response = "-1";
         }
         else
         {
             var files = Directory.GetFiles(path);
             var directories = Directory.GetDirectories(path);
 
-            response += $"{files.Count() + directories.Count()}\n";
+            response += $"{files.Count() + directories.Count()} ";
 
             foreach (var fileName in files)
             {
-                response += $"f {fileName}\n";
+                response += $"f {fileName} ";
             }
 
             foreach (var directoryName in directories)
             {
-                response += $"d {directoryName}\n";
+                response += $"d {directoryName} ";
             }
         }
 

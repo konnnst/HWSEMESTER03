@@ -1,8 +1,8 @@
 namespace Server;
 
-public class Executor
+public static class Executor
 {
-    public string RespondCommand(string commandType, string path)
+    public static string RespondCommand(string commandType, string path)
     {
         string response;
         if (commandType == "get")

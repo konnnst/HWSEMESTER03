@@ -14,7 +14,7 @@ class ServerNetwork
     {
         _port = port;
     }
-    public void ProcessMessages()
+    public void RespondCommands()
     {
         var listener = new TcpListener(IPAddress.Any, _port);
         listener.Start();
@@ -23,9 +23,29 @@ class ServerNetwork
         {
             var stream = new NetworkStream(socket);
             var reader = new StreamReader(stream);
+            var writer = new StreamWriter(stream);
+            string response;
 
-            var message = reader.ReadToEnd();
-            Console.WriteLine(message);
+            while (true)
+            {
+                var query = reader.ReadLine();
+                
+                if (query == null)
+                {
+                    response = "Empty query";
+                }
+                else if (Parser.Parse(query))
+                {
+                    response = Executor.RespondCommand(Parser.CommandType, Parser.Path);
+                }
+                else
+                {
+                    response = "Incorrect query format";
+                }
+
+                writer.WriteLine(response);
+                writer.Flush();
+            }
         }
 
         listener.Stop();
