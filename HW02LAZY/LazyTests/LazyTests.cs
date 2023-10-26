@@ -4,7 +4,34 @@ using MyLazy;
 
 namespace LazyTests;
 
+/// <summary>
+/// Fraction calculation. Throws exception
+/// if deviding zero
+/// </summary>
+public class Fraction
+{
+    int _numerator;
+    int _denominator;
+    
+    public Fraction(int numerator, int denominator)
+    {
+        _numerator = numerator;
+        _denominator = denominator;
+    }
 
+    public double Calculate()
+    {
+        if (_denominator != 0)
+        {
+            return (double)_numerator / _denominator;
+        }
+        else
+        {
+            throw new Exception("Zero division achtung");
+        }
+    }
+}
+   
 /// <summary>
 /// Counts calculation attempts from all working threads
 /// </summary>
@@ -21,6 +48,18 @@ public class Counter
 [TestClass]
 public class LazySingleThreadTests
 {
+    [TestMethod]
+    public void ExceptionGetTest()
+    {
+        var successCalc = new Fraction(5, 2);
+        var exceptionCalc = new Fraction(5, 0);
+        var successLazy = new LazySingleThread<double>(successCalc.Calculate);
+        var exceptionLazy = new LazySingleThread<double>(exceptionCalc.Calculate);
+
+        Assert.IsTrue(successLazy.Get() == 2.5);
+        Assert.IsTrue(exceptionLazy.Get() == default(double));
+    }
+
     [TestMethod]
     public void GetTest()
     {
@@ -39,6 +78,17 @@ public class LazySingleThreadTests
 [TestClass]
 public class LazyMultiThreadTests
 {
+    [TestMethod]
+    public void ExceptionGetTest()
+    {
+        var successCalc = new Fraction(5, 2);
+        var exceptionCalc = new Fraction(5, 0);
+        var successLazy = new LazyMultiThread<double>(successCalc.Calculate);
+        var exceptionLazy = new LazyMultiThread<double>(exceptionCalc.Calculate);
+
+        Assert.IsTrue(successLazy.Get() == 2.5);
+        Assert.IsTrue(exceptionLazy.Get() == default(double));
+    }
     [TestMethod]
     public void GetTest()
     {
