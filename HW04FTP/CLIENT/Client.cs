@@ -6,8 +6,7 @@ internal class MyClient
 {
     static void Main()
     {
-        var client = new ClientNetwork();
-        client.SendCommands();
+        ClientUI.Start();
         Console.ReadKey();
     } 
 }

@@ -30,24 +30,19 @@ public class ClientNetwork
         _address = address;
     }   
 
-    public void SendCommands()
+    public string GetServerResponse(string query)
     {
         using (var client = new TcpClient(_address, _port))
         {
             var stream = client.GetStream();
             var reader = new StreamReader(stream);
             var writer = new StreamWriter(stream);
+            writer.WriteLine(query);
+            writer.Flush();
 
-            while (true)
-            {
-                Console.Write("simple-ftp > ");
-                var query = Console.ReadLine();
-                writer.WriteLine(query);
-                writer.Flush();
+            var response = reader.ReadLine();
 
-                var response = reader.ReadLine();
-                Console.WriteLine(response);
-            }
+            return response;
         }
     }
 }

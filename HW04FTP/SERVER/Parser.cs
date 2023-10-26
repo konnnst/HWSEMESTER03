@@ -2,12 +2,22 @@ using System;
 
 namespace Server;
 
+
+/// <summary>
+/// Parse command in execution ready form
+/// </summary>
 public static class Parser
 {
     private static string? _commandType;
     private static string? _path;
 
+    /// <summary>
+    /// Returns main command word
+    /// </summary>
     public static string? CommandType => _commandType;
+    /// <summary>
+    /// Return path used in command
+    /// </summary>
     public static string? Path => _path;
 
     public static bool Parse(string rawCommand)
@@ -40,6 +50,11 @@ public static class Parser
         return true;
     }
 
+    /// <summary>
+    /// Takes path string and checks for incorrect symbols
+    /// </summary>
+    /// <param name="path">Path string</param>
+    /// <returns>Returns true if string correct</returns>
     private static bool CheckIfPathValid(string path)
     {
         char[] restrictedSymbols = { '<', '>', ']', '[', '(', ')', '\'', '"', ' ' };

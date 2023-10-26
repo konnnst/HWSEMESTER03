@@ -14,22 +14,23 @@ class ServerNetwork
     {
         _port = port;
     }
-    public void RespondCommands()
+    public async void RespondCommands()
     {
         var listener = new TcpListener(IPAddress.Any, _port);
         listener.Start();
 
-        using (var socket = listener.AcceptSocket())
+        while (true)
         {
-            var stream = new NetworkStream(socket);
-            var reader = new StreamReader(stream);
-            var writer = new StreamWriter(stream);
-            string response;
+            var socket = await listener.AcceptSocketAsync();
 
-            while (true)
-            {
-                var query = reader.ReadLine();
-                
+            Task.Run(async () => {
+                var stream = new NetworkStream(socket);
+                var reader = new StreamReader(stream);
+                var writer = new StreamWriter(stream);
+
+                var query = await reader.ReadLineAsync();
+                string response;
+
                 if (query == null)
                 {
                     response = "Empty query";
@@ -43,11 +44,11 @@ class ServerNetwork
                     response = "Incorrect query format";
                 }
 
-                writer.WriteLine(response);
-                writer.Flush();
-            }
-        }
+                await writer.WriteAsync(response);
+                await writer.FlushAsync();
 
-        listener.Stop();
+                socket.Close();
+            });
+        }
     }
 }
