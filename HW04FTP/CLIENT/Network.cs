@@ -1,6 +1,10 @@
 using System.Net.Sockets;
 
 namespace Client;
+
+/// <summary>
+/// Managing connection with server
+/// </summary>
 public class ClientNetwork
 {
     private int _port;
@@ -30,6 +34,11 @@ public class ClientNetwork
         _address = address;
     }   
 
+    /// <summary>
+    /// Communication with server
+    /// </summary>
+    /// <param name="query">Raw command string</param>
+    /// <returns>Response string</returns>
     public string GetServerResponse(string query)
     {
         using (var client = new TcpClient(_address, _port))

@@ -7,6 +7,5 @@ internal class MyClient
     static void Main()
     {
         ClientUI.Start();
-        Console.ReadKey();
     } 
 }

@@ -2,7 +2,6 @@ using System;
 
 namespace Server;
 
-
 /// <summary>
 /// Parse command in execution ready form
 /// </summary>
@@ -20,6 +19,11 @@ public static class Parser
     /// </summary>
     public static string? Path => _path;
 
+    /// <summary>
+    /// Parse raw command to Parser object properties as CommandType and Path
+    /// </summary>w
+    /// <param name="rawCommand"></param>
+    /// <returns>Returns true, if given string is correct, else false</returns>
     public static bool Parse(string rawCommand)
     {
         string[] commandParts = rawCommand.Split();

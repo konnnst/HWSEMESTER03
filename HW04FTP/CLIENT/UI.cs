@@ -1,7 +1,13 @@
 namespace Client;
 
+/// <summary>
+/// Simple user interface for client
+/// </summary>
 public static class ClientUI
 {
+    /// <summary>
+    /// Starts client command loops
+    /// </summary>
     public static void Start()
     {
         var run = true;

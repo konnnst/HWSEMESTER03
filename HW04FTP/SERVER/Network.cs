@@ -2,6 +2,10 @@ using System.Net.Sockets;
 using System.Net;
 
 namespace Server;
+
+/// <summary>
+/// Managing port and connection with clients
+/// </summary>
 class ServerNetwork
 {
     private int _port;
@@ -14,6 +18,10 @@ class ServerNetwork
     {
         _port = port;
     }
+
+    /// <summary>
+    /// Starts listenting to port and sending responses to commands 
+    /// </summary>
     public async void RespondCommands()
     {
         var listener = new TcpListener(IPAddress.Any, _port);
