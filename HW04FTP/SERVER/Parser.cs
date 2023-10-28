@@ -61,7 +61,7 @@ public static class Parser
     /// <returns>Returns true if string correct</returns>
     private static bool CheckIfPathValid(string path)
     {
-        char[] restrictedSymbols = { '<', '>', ']', '[', '(', ')', '\'', '"', ' ' };
+        char[] restrictedSymbols = { '<', '>' };
         foreach (var symbol in path)
         {
             if (restrictedSymbols.Contains<char>(symbol))
@@ -69,6 +69,6 @@ public static class Parser
                 return false;
             }
         }
-        return true;
+           return true;
     }
 }

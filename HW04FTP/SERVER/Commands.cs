@@ -28,6 +28,8 @@ public static class Commands
             {
                 response += $"{bytePiece} ";
             }
+
+            response = response.Trim();
         }
 
         return response;
@@ -64,6 +66,8 @@ public static class Commands
             {
                 response += $"d {directoryName} ";
             }
+
+            response = response.Trim();
         }
 
         return response;

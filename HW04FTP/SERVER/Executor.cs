@@ -24,7 +24,7 @@ public static class Executor
         }
         else
         {
-            response = "ACHTUNG! ACHTUNG! INCORRECT COMMAND!";
+            response = "ACHTUNG! ACHTUNG! INCORRECT COMMAND WORD!";
         }
 
         return response;
