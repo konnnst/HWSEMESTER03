@@ -3,7 +3,6 @@ using System.Diagnostics;
 namespace Unit;
 public class Tester
 {
-    private delegate void Action();
     private Assembly _asm;
 
     public Tester(Assembly asm)
@@ -13,17 +12,9 @@ public class Tester
 
     private bool IsSkipTestMethod(Action testMethod)
     {
-        foreach (var attr in testMethod.Method.GetCustomAttributes())
-        {
-            if (attr is Test)
-            {
-                if ((attr as Test).Ignore != "NORMAL")
-                return true;
-            }
-        }
-        return false;
+        var ignore = (testMethod.Method.GetCustomAttribute(typeof(Test)) as Test).Ignore;
+        return ignore != "NORMAL";
     } 
-
     private string GetSkipMessage(Action testMethod)
     {
         return (testMethod.Method.GetCustomAttribute(typeof(Test)) as Test).Ignore;
@@ -112,22 +103,10 @@ public class Tester
         }
     }
 
-    private void WriteStatsSpecialMethods(Type t, Action? beforeClass, Action? afterClass,
-                                    Action? before, Action? after, List<Action> testMethods)
+    private bool IsExpectedException(Exception ex, Action testMethod)
     {
-        Console.WriteLine("Class {0}: " +
-                        "test methods - {1}, " +
-                        "beforeClass - {2}, " +
-                        "afterClass - {3}, " +
-                        "before - {4}, " +
-                        "after - {5}", t.Name, testMethods.Count, Convert.ToInt32(beforeClass != null),
-                        Convert.ToInt32(afterClass != null), Convert.ToInt32(before != null),
-                        Convert.ToInt32(after != null));
-    }
-
-    private bool IsExpectedException(string )
-    {
-
+        var expected_list = (testMethod.Method.GetCustomAttribute(typeof(Test)) as Test).Expected;
+        return expected_list.Contains(ex.Message);
     }
     private void RunSpecialMethods(Action? beforeClass, Action? afterClass,
                                     Action? before, Action? after, List<Action> testMethods)
@@ -147,9 +126,7 @@ public class Tester
             if (IsSkipTestMethod(testMethod))
             {
                 var skipMessage = GetSkipMessage(testMethod);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Skipped {testMethod.Method.Name} test method. Message:\n\t{skipMessage}");
-                Console.ForegroundColor = ConsoleColor.White;
+                InfoWriter.WriteSkipMessage(testMethod, skipMessage);
             }
             else
             {
@@ -165,10 +142,12 @@ public class Tester
                 }
                 catch (Exception ex)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Error message in {testMethod.Method}: \n\t{ex.Message}");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    failedCount++;
+                    if (!IsExpectedException(ex, testMethod))
+                    {
+                        var exceptionMessage = ex.Message;
+                        InfoWriter.WriteExceptionMessage(testMethod, exceptionMessage);
+                        failedCount++;
+                    }
                 }
                 stopwatch.Stop();
                 var time = stopwatch.ElapsedMilliseconds;
@@ -185,20 +164,7 @@ public class Tester
             afterClass();
         }
 
-        if (failedCount != 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-        }
-        Console.WriteLine($"Tests finished: " +
-                        $"passed - {testMethods.Count() - failedCount - skippedCount}, " +
-                        $"failed - {failedCount}, " +
-                        $"skipped - {skippedCount}, " +
-                        $"total time elapsed - {elapsedTime.Sum()} ms\n");
-        Console.ForegroundColor = ConsoleColor.White;
+        InfoWriter.WriteTestResults(elapsedTime, testMethods, failedCount, skippedCount);
     }
 
     public void RunTests()
@@ -216,9 +182,9 @@ public class Tester
             Action? after = null;
             List<Action> testMethods = new();
             GetSpecialMethods(t, beforeClass, afterClass, before, after, testMethods);
-            WriteStatsSpecialMethods(t, beforeClass, afterClass, before, after, testMethods);
+            InfoWriter.WriteStatsSpecialMethods(t, beforeClass, afterClass, before, after, testMethods);
             RunSpecialMethods(beforeClass, afterClass, before, after, testMethods);
-            }
+        }
     }
 
 }

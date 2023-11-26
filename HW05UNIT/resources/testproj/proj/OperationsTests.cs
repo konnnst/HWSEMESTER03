@@ -11,7 +11,7 @@ public class OperationsTests
         Console.WriteLine("Plus test is running");
     }
 
-    [Test(true, "лучше всех")]
+    [Test(new string[] {"ACHTUNG! Failed"})]
     public void MinusTest()
     {
         Console.WriteLine(1.Equals(1));
@@ -20,10 +20,11 @@ public class OperationsTests
         Assert.Fail();
     }
 
-    [Test(false)]
+    [Test()]
     public void MultTest()
     {
         Console.WriteLine("Mult test is running");
+        Assert.Fail();
     }
 
     [Test()]
