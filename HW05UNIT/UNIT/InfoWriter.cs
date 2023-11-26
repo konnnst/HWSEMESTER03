@@ -22,14 +22,14 @@ public static class InfoWriter
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    public static void WriteExceptionMessage(Action testMethod, string exceptionMessage)
+    public static void WriteExceptionMessage(Action testMethod, string exceptionMessage, long elapsedTime)
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"Error message in {testMethod.Method}: \n\t{exceptionMessage}");
+        Console.WriteLine($"Failed {testMethod.Method} [{elapsedTime} ms]: \n\t{exceptionMessage}");
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    public static void WriteTestResults(int[] elapsedTime, List<Action> testMethods,
+    public static void WriteTestResults(List<long> elapsedTime, List<Action> testMethods,
                 int failedCount, int skippedCount)
     {
         if (failedCount != 0)

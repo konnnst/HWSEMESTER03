@@ -112,7 +112,7 @@ public class Tester
                                     Action? before, Action? after, List<Action> testMethods)
     {
         var stopwatch = new Stopwatch();
-        var elapsedTime = new int[testMethods.Count()];
+        var elapsedTime = new List<long>();
         var failedCount = 0;
         var skippedCount = 0;
 
@@ -135,22 +135,23 @@ public class Tester
                     before();
                 }
 
-                stopwatch.Start();
                 try
                 {
+                    stopwatch.Start();
                     testMethod();
+                    stopwatch.Stop();
                 }
                 catch (Exception ex)
                 {
                     if (!IsExpectedException(ex, testMethod))
                     {
                         var exceptionMessage = ex.Message;
-                        InfoWriter.WriteExceptionMessage(testMethod, exceptionMessage);
+                        InfoWriter.WriteExceptionMessage(testMethod, exceptionMessage, stopwatch.ElapsedMilliseconds);
                         failedCount++;
                     }
                 }
-                stopwatch.Stop();
-                var time = stopwatch.ElapsedMilliseconds;
+               //    Console.WriteLine(stopwatch.ElapsedMilliseconds);
+                elapsedTime.Add(stopwatch.ElapsedMilliseconds);
                 stopwatch.Reset();
 
                 if (after != null)

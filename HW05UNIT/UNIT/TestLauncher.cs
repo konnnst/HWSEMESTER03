@@ -44,7 +44,7 @@ public class TestLauncher
                 if (asm.ManifestModule.Name == "proj.dll")
                 {
                     tester.RunTests();
-                }
+                }   
                 Console.WriteLine();
         }
     }
