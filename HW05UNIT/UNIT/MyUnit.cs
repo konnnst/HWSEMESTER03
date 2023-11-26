@@ -1,8 +1,7 @@
-﻿using System;
-using System.Reflection;
+global using System;
+global using System.Reflection;
 
 namespace Unit;
-
 
 class MyUnit
 {
@@ -10,13 +9,11 @@ class MyUnit
     {
         if (args.Count<string>() == 1)
         {
-            Console.WriteLine("Running tests");
+            TestLauncher.RunTests(args[0]);
         }
         else
         {
             Console.WriteLine("Incorrect arguments count");
         }
-
-        Console.Read();
     }
 }
