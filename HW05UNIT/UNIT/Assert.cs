@@ -28,7 +28,7 @@ public static class Assert
 
     public static void AreNotEqual(object a, object b)
     {
-        if (!a.Equals(b))
+        if (a.Equals(b))
         {
             throw new Exception($"ACHTUNG! Assert.AreNotEqual failed ({a}, {b} are equal)");
         }
@@ -36,17 +36,17 @@ public static class Assert
 
     public static void IsNull(object a)
     {
-        if (a == null)
+        if (a != null)
         {
-            throw new Exception($"ACHTUNG! Assert.IsNull failed");
+            throw new Exception($"ACHTUNG! Assert.IsNull failed ({a} is not null)");
         }
     }
 
     public static void IsNotNull(object a)
     {
-        if (a != null)
+        if (a == null)
         {
-            throw new Exception($"ACHTUNG! Assert.IsNotNull failed");
+            throw new Exception($"ACHTUNG! Assert.IsNotNull failed ({a} is null)");
         }
     }
 
