@@ -3,7 +3,7 @@ namespace Unit;
 [AttributeUsage(AttributeTargets.Method)]
 public class Test : Attribute
 {
-    public bool Expected { get; } = false;
+    public string[] Expected { get; } = {};
     public string Ignore { get; } = "NORMAL";
 
     public Test() {}
@@ -13,12 +13,12 @@ public class Test : Attribute
         Ignore = ignore;
     }
 
-    public Test(bool expected)
+    public Test(string[] expected)
     {
         Expected = expected;
     }
 
-    public Test(bool expected, string ignore)
+    public Test(string[] expected, string ignore)
     {
         Expected = expected;
         Ignore = ignore;

@@ -11,6 +11,23 @@ public class Tester
         _asm = asm;
     }
 
+    private bool IsSkipTestMethod(Action testMethod)
+    {
+        foreach (var attr in testMethod.Method.GetCustomAttributes())
+        {
+            if (attr is Test)
+            {
+                if ((attr as Test).Ignore != "NORMAL")
+                return true;
+            }
+        }
+        return false;
+    } 
+
+    private string GetSkipMessage(Action testMethod)
+    {
+        return (testMethod.Method.GetCustomAttribute(typeof(Test)) as Test).Ignore;
+    }
     private bool ValidateMethod(MethodInfo method, IEnumerable<Attribute> attrs)
     {
         var flag = false;
@@ -108,6 +125,10 @@ public class Tester
                         Convert.ToInt32(after != null));
     }
 
+    private bool IsExpectedException(string )
+    {
+
+    }
     private void RunSpecialMethods(Action? beforeClass, Action? afterClass,
                                     Action? before, Action? after, List<Action> testMethods)
     {
@@ -123,30 +144,40 @@ public class Tester
         }
         foreach (var testMethod in testMethods)
         {
-            if (before != null)
+            if (IsSkipTestMethod(testMethod))
             {
-                before();
-            }
-
-            stopwatch.Start();
-            try
-            {
-                testMethod();
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Error message in {testMethod.Method}: \n\t{ex.Message}");
+                var skipMessage = GetSkipMessage(testMethod);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Skipped {testMethod.Method.Name} test method. Message:\n\t{skipMessage}");
                 Console.ForegroundColor = ConsoleColor.White;
-                failedCount++;
             }
-            stopwatch.Stop();
-            var time = stopwatch.ElapsedMilliseconds;
-            stopwatch.Reset();
-
-            if (after != null)
+            else
             {
-                after();
+                if (before != null)
+                {
+                    before();
+                }
+
+                stopwatch.Start();
+                try
+                {
+                    testMethod();
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Error message in {testMethod.Method}: \n\t{ex.Message}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    failedCount++;
+                }
+                stopwatch.Stop();
+                var time = stopwatch.ElapsedMilliseconds;
+                stopwatch.Reset();
+
+                if (after != null)
+                {
+                    after();
+                }
             }
         }
         if (afterClass != null)
