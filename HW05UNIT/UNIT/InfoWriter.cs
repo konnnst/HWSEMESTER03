@@ -1,5 +1,9 @@
 namespace Unit;
 
+
+/// <summary>
+/// Writes stats and messages in pretty form using templates
+/// </summary>
 public static class InfoWriter
 {
     public static void WriteStatsSpecialMethods(Type t, Action? beforeClass, Action? afterClass,

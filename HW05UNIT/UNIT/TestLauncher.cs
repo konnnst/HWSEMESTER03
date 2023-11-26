@@ -2,7 +2,10 @@ using System.Reflection;
 
 namespace Unit;
 
-public class TestLauncher
+/// <summary>
+/// Runs tests for every assembly in chosen path
+/// </summary>
+public static class TestLauncher
 {
     private static List<Assembly> assemblies = new();
     private static IEnumerable<string> GetAssemblyPaths(string path)
@@ -25,6 +28,10 @@ public class TestLauncher
         return false;
     }
 
+    /// <summary>
+    /// Runs tests for every assembly in chosen path
+    /// </summary>
+    /// <param name="path">Path to folder, holding the assemblies</param>
     public static void RunTests(string path)
     {
         var paths = GetAssemblyPaths(path);

@@ -1,10 +1,18 @@
 using System.Diagnostics;
 
 namespace Unit;
+
+/// <summary>
+/// Runs test for given assembly
+/// </summary>
 public class Tester
 {
     private Assembly _asm;
 
+    /// <summary>
+    /// Creates tester object using path
+    /// </summary>
+    /// <param name="asm">Assembly path</param>
     public Tester(Assembly asm)
     {
         _asm = asm;
@@ -150,7 +158,6 @@ public class Tester
                         failedCount++;
                     }
                 }
-               //    Console.WriteLine(stopwatch.ElapsedMilliseconds);
                 elapsedTime.Add(stopwatch.ElapsedMilliseconds);
                 stopwatch.Reset();
 
@@ -166,8 +173,12 @@ public class Tester
         }
 
         InfoWriter.WriteTestResults(elapsedTime, testMethods, failedCount, skippedCount);
-    }
+    } 
 
+
+    /// <summary>
+    /// Runst test methods in selected assembly 
+    /// </summary>
     public void RunTests()
     {
         foreach (var t in _asm.ExportedTypes)
