@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\UNIT\UNIT.csproj" />
+    <Reference Include="..\..\..\UNIT\bin/Debug/net7.0/UNIT.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+  <Reference Include="UNIT">
+    <HintPath>"..\..\..\UNIT\bin/Debug/net7.0/UNIT.dll</HintPath>
+  </Reference>
+  
+</ItemGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
