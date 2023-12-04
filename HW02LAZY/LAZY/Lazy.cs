@@ -108,9 +108,3 @@ public class Counter
         return ++_counterValue;
     }
 }
-internal class MyLazy
-{
-    static void Main()
-    {
-    }   
-}
