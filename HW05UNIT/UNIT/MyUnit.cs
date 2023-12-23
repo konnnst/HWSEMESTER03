@@ -14,7 +14,7 @@ class MyUnit
         else
         {
             TestLauncher.RunTests("/home/konnnst/Desktop/hw/HW05UNIT/resources/testproj/proj/bin/Debug/net8.0/");
-            //Console.WriteLine("Incorrect arguments count");
+            //Console.WriteLine("Incorrect arguments count"); 
         }
     }
 }

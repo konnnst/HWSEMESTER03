@@ -164,8 +164,8 @@ public class Tester
 
                 if (!exceptionFlag)
                 {
-                    var correctTestMethod = new CorrectTestMethodInfo(testMethod.Method.Name, stopwatch.ElapsedMilliseconds);
-                    testClassInfo.AddCorrect(correctTestMethod);
+                    var correctTestMethod = new PassedTestMethodInfo(testMethod.Method.Name, stopwatch.ElapsedMilliseconds);
+                    testClassInfo.AddPassed(correctTestMethod);
                 }
 
 
@@ -196,7 +196,7 @@ public class Tester
     }
 
     /// <summary>
-    /// Runs test methods in selected assembly 
+    /// Runs test methods and logs results in selected assembly 
     /// </summary>
     public BuildInfo RunTests()
     {

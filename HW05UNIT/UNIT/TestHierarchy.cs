@@ -1,14 +1,20 @@
 namespace Unit;
 
-public class CorrectTestMethodInfo : TestMethodInfo
+/// <summary>
+/// Logs test results for passed test method
+/// </summary>
+public class PassedTestMethodInfo : TestMethodInfo
 {
-    public CorrectTestMethodInfo(string name, long timeElapsed)
+    public PassedTestMethodInfo(string name, long timeElapsed)
     {
         Name = name;
         TimeElapsed = timeElapsed;
     }
 }
 
+/// <summary>
+/// Logs test results for failed test method
+/// </summary>
 public class FailedTestMethodInfo : TestMethodInfo
 {
     public string Message { get; private set; } = "";
@@ -21,6 +27,9 @@ public class FailedTestMethodInfo : TestMethodInfo
     }
 }
 
+/// <summary>
+/// Logs test results for skipped test method
+/// </summary>
 public class SkippedTestMethodInfo : TestMethodInfo
 {
     public string Message { get; private set; } = "";
@@ -33,12 +42,17 @@ public class SkippedTestMethodInfo : TestMethodInfo
     }
 }
 
+
 public abstract class TestMethodInfo
 {
     public string Name { get; protected set; } = "";
     public long TimeElapsed { get; protected set; }
 }
 
+
+/// <summary>
+/// Logs test results for class marked as UnitTestClass
+/// </summary>
 public class TestClassInfo
 {
     public string ClassName { get; private set; } = "";
@@ -49,23 +63,32 @@ public class TestClassInfo
     public int AfterCount { get; set; }
     public long totalTimeElapsed { get; private set; } = 0;
 
-    public List<CorrectTestMethodInfo> Correct { get; private set; }
+    public List<PassedTestMethodInfo> Passed { get; private set; }
     public List<FailedTestMethodInfo> Failed { get; private set; }
     public List<SkippedTestMethodInfo> Skipped { get; private set; }
     
     public TestClassInfo(Type t)
     {
         ClassName = t.Name;
-        Correct = new();
+        Passed = new();
         Failed = new();
         Skipped = new();
     }
 
-    public void AddCorrect(CorrectTestMethodInfo method)
+    /// <summary>
+    /// Adds passed method test log to class instance
+    /// </summary>
+    /// <param name="method"></param>
+    public void AddPassed(PassedTestMethodInfo method)
     {
-        Correct.Add(method);
+        Passed.Add(method);
         totalTimeElapsed += method.TimeElapsed;
     }
+
+    /// <summary>
+    /// Adds failed method test log to class instance
+    /// </summary>
+    /// <param name="method"></param>
 
     public void AddFailed(FailedTestMethodInfo method)
     {
@@ -73,6 +96,11 @@ public class TestClassInfo
         totalTimeElapsed += method.TimeElapsed;
 
     }
+
+    /// <summary>
+    /// Adds skipped method test log to class instance
+    /// </summary>
+    /// <param name="method"></param>
 
     public void AddSkipped(SkippedTestMethodInfo method)
     {
@@ -82,6 +110,10 @@ public class TestClassInfo
 
 }
 
+
+/// <summary>
+/// Logs test result for assembly
+/// </summary>
 public class BuildInfo
 {
     public List<TestClassInfo> TestClasses { get; private set; }

@@ -1,7 +1,15 @@
 using Unit;
 
+
+/// <summary>
+/// Contains methods to print logged test information to console
+/// </summary>
 public static class InfoPrinter
 {
+    /// <summary>
+    /// Prints logged test info about tested class to console
+    /// </summary>
+    /// <param name="testClassInfo"></param>
     public static void PrintClassInfo(TestClassInfo testClassInfo)
     {
         Console.WriteLine($"Class {testClassInfo.ClassName}");
@@ -28,13 +36,18 @@ public static class InfoPrinter
         {
             Console.ForegroundColor = ConsoleColor.Green;
         }
-        Console.WriteLine($"Passed - {testClassInfo.Correct.Count}, " +
+        Console.WriteLine($"Passed - {testClassInfo.Passed.Count}, " +
                         $"failed - {testClassInfo.Failed.Count}, " +
                         $"skipped - {testClassInfo.Skipped.Count}\n" +
                         $"Elapsed time - {testClassInfo.totalTimeElapsed} ms");
         Console.ForegroundColor = ConsoleColor.White;
 
     }
+
+    /// <summary>
+    /// Prints logged test info about all tested classes in a build to console
+    /// </summary>
+    /// <param name="buildInfo"></param>
     public static void PrintBuildInfo(BuildInfo buildInfo)
     {
         Console.WriteLine($"Test results for {buildInfo.BuildName}");
@@ -45,6 +58,10 @@ public static class InfoPrinter
         }
     }
 
+    /// <summary>
+    /// Prints logged test info about all tested builds to console
+    /// </summary>
+    /// <param name="buildInfoList"></param>
     public static void PrintInfo(List<BuildInfo> buildInfoList)
     {
         foreach (var buildInfo in buildInfoList)
