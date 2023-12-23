@@ -35,6 +35,7 @@ public static class TestLauncher
     public static void RunTests(string path)
     {
         var paths = GetAssemblyPaths(path);
+        var buildStats = new List<BuildInfo>();
 
         foreach (var asm_path in paths)
         {
@@ -48,12 +49,11 @@ public static class TestLauncher
         {
             var tester = new Tester(asm);
             Console.WriteLine($"Running tests for {asm.Location}");
-                if (asm.ManifestModule.Name == "proj.dll")
-                {
-                    tester.RunTests();
-                }   
-                Console.WriteLine();
+            var buildInfo = tester.RunTests();
+            buildStats.Add(buildInfo);
         }
+
+        InfoPrinter.PrintInfo(buildStats);
     }
 }
 

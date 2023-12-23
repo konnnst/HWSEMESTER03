@@ -75,3 +75,11 @@ public class Before : Attribute
 public class After : Attribute
 {
 }
+
+/// <summary>
+/// Marks class as TestClass, where test methods will be searched
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public class UnitTestClass : Attribute
+{
+}

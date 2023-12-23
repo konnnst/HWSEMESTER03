@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace Tests;
 
+[UnitTestClass]
 public class OperationsTests
 {
     [Test()]
@@ -24,7 +25,7 @@ public class OperationsTests
         Assert.Fail();
     }
 
-    [Test()]
+    [Test("ololo")]
     public void MultTest()
     {
         Console.WriteLine("Mult test is running");

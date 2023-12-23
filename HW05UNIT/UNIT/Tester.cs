@@ -116,15 +116,11 @@ public class Tester
         var expected_list = (testMethod.Method.GetCustomAttribute(typeof(Test)) as Test).Expected;
         return expected_list.Contains(ex.Message);
     }
-    private void RunSpecialMethods(Action? beforeClass, Action? afterClass,
+    private void RunSpecialMethods(TestClassInfo testClassInfo, Action? beforeClass, Action? afterClass,
                                     Action? before, Action? after, List<Action> testMethods)
     {
         var stopwatch = new Stopwatch();
-        var elapsedTime = new List<long>();
-        var failedCount = 0;
-        var skippedCount = 0;
 
-        Console.WriteLine("Starting tests... ");
         if (beforeClass != null)
         {
             beforeClass();
@@ -134,7 +130,8 @@ public class Tester
             if (IsSkipTestMethod(testMethod))
             {
                 var skipMessage = GetSkipMessage(testMethod);
-                InfoWriter.WriteSkipMessage(testMethod, skipMessage);
+                var skippedTestMethod = new SkippedTestMethodInfo(testMethod.Method.Name, 0, skipMessage);
+                testClassInfo.AddSkipped(skippedTestMethod);
             }
             else
             {
@@ -143,6 +140,7 @@ public class Tester
                     before();
                 }
 
+                var exceptionFlag = false;
                 try
                 {
                     stopwatch.Start();
@@ -151,14 +149,26 @@ public class Tester
                 }
                 catch (Exception ex)
                 {
+                    stopwatch.Stop();
                     if (!IsExpectedException(ex, testMethod))
                     {
+
                         var exceptionMessage = ex.Message;
-                        InfoWriter.WriteExceptionMessage(testMethod, exceptionMessage, stopwatch.ElapsedMilliseconds);
-                        failedCount++;
+                        exceptionFlag = true;
+                        var failedTestMethod = new FailedTestMethodInfo(testMethod.Method.Name,
+                                                                    stopwatch.ElapsedMilliseconds,
+                                                                    exceptionMessage);
+                        testClassInfo.AddFailed(failedTestMethod);
                     }
                 }
-                elapsedTime.Add(stopwatch.ElapsedMilliseconds);
+
+                if (!exceptionFlag)
+                {
+                    var correctTestMethod = new CorrectTestMethodInfo(testMethod.Method.Name, stopwatch.ElapsedMilliseconds);
+                    testClassInfo.AddCorrect(correctTestMethod);
+                }
+
+
                 stopwatch.Reset();
 
                 if (after != null)
@@ -171,22 +181,38 @@ public class Tester
         {
             afterClass();
         }
+    }
 
-        InfoWriter.WriteTestResults(elapsedTime, testMethods, failedCount, skippedCount);
-    } 
-
+    private bool IsTestClass(Type t)
+    {
+        foreach (var attr in t.GetCustomAttributes())
+        {
+            if (attr is UnitTestClass)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /// <summary>
-    /// Runst test methods in selected assembly 
+    /// Runs test methods in selected assembly 
     /// </summary>
-    public void RunTests()
+    public BuildInfo RunTests()
     {
+        var build = new BuildInfo(_asm);
         foreach (var t in _asm.ExportedTypes)
         {
             if (!t.IsClass)
             {
                 continue;
             }
+            if (!IsTestClass(t))
+            {
+                continue;
+            }
+
+            var testClassInfo = new TestClassInfo(t);
 
             Action? beforeClass = null;
             Action? afterClass = null;
@@ -194,9 +220,13 @@ public class Tester
             Action? after = null;
             List<Action> testMethods = new();
             GetSpecialMethods(t, beforeClass, afterClass, before, after, testMethods);
-            InfoWriter.WriteStatsSpecialMethods(t, beforeClass, afterClass, before, after, testMethods);
-            RunSpecialMethods(beforeClass, afterClass, before, after, testMethods);
+            InfoWriter.WriteStatsSpecialMethods(testClassInfo, beforeClass, afterClass, before, after, testMethods);
+            RunSpecialMethods(testClassInfo, beforeClass, afterClass, before, after, testMethods);
+
+            build.AddClassInfo(testClassInfo);
         }
+
+        return build;
     }
 
 }
