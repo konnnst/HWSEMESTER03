@@ -11,7 +11,7 @@ public static class Commands
     /// </summary>
     /// <param name="path">Absolute or relative path of target file</param>
     /// <returns>Response string</returns>
-    public static string Get(string path)
+    public static async Task<string> Get(string path)
     {
         var response = "";
 
@@ -24,7 +24,7 @@ public static class Commands
             var file = new FileInfo(path);
 
             response += $"{file.Length} ";
-            foreach (var bytePiece in File.ReadAllBytes(path))
+            foreach (var bytePiece in await File.ReadAllBytesAsync(path))
             {
                 response += $"{bytePiece} ";
             }

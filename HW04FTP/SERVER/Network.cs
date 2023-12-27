@@ -12,7 +12,7 @@ class ServerNetwork
 
     public ServerNetwork()
     {   
-        _port = 1488;
+        _port = 1337;
     }
     public ServerNetwork(int port)
     {
@@ -45,7 +45,7 @@ class ServerNetwork
                 }
                 else if (Parser.Parse(query))
                 {
-                    response = Executor.RespondCommand(Parser.CommandType, Parser.Path);
+                    response = await Executor.RespondCommand(Parser.CommandType, Parser.Path);
                 }
                 else
                 {

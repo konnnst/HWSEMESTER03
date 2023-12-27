@@ -7,16 +7,16 @@ namespace SERVER.Tests;
 public class CommandsTests
 {
     [TestMethod]
-    public void GetTest()
+    public async Task IsGetTest()
     {
         var invalidPath = "/a/b/c/d/e/f/g.txt";
         var correctPath = "../../../../SERVER/Parser.cs";
 
-        var invalidResponse = Commands.Get(invalidPath);
-        var correctResponse = Commands.Get(correctPath);
+        var invalidResponse = await Commands.Get(invalidPath);
+        var correctResponse = await Commands.Get(correctPath);
 
-        var givenSize = Convert.ToInt32(correctResponse.Split()[0]);
-        var realSize = correctResponse.Split().Count<string>() - 1;
+        var givenSize = Convert.ToInt32(correctResponse.Split(' ')[0]);
+        var realSize = correctResponse.Split(' ').Count<string>() - 1;
 
     
         Assert.AreEqual(invalidResponse, "-1");
@@ -25,7 +25,7 @@ public class CommandsTests
 
     private bool IsListResponseCorrect(string response)
     {
-        var objectList = response.Split();
+        var objectList = response.Split(' ');
         var givenObjectCount = Convert.ToInt32(objectList[0]);
         var realObjectCount = (objectList.Count<string>() - 1) / 2;
 

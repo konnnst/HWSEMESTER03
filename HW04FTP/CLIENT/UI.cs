@@ -8,16 +8,16 @@ public static class ClientUI
     /// <summary>
     /// Starts client command loops
     /// </summary>
-    public static void Start()
+    public static async Task Start()
     {
-        var run = true;
+        var cancellationToken = new CancellationToken();
         var connection = new ClientNetwork();
 
-        while (run)
+        while (!cancellationToken.IsCancellationRequested)
         {
             Console.Write("ftp_client > ");
-            var query = Console.ReadLine();
-            var response = connection.GetServerResponse(query);
+            var query = "list /";
+            var response = await connection.GetServerResponse(query);
             Console.WriteLine(response);
         }
     }

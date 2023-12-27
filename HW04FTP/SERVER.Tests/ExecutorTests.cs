@@ -4,15 +4,26 @@ namespace SERVER.Tests;
 public class ExecutorTests
 {
     [TestMethod]
-    public void RespondCommandTest()
+    public async Task RespondGetCommandTest()
     {
-        string[] incorrectCommandWord = { "rm -rfd", "/" };
         string[] getCommand = { "get", "../../../../SERVER/Parser.cs" };
+
+        Assert.AreNotEqual(await Executor.RespondCommand(getCommand[0], getCommand[1]), "-1");
+    }
+
+    [TestMethod]
+    public async Task RespondListCommandTest()
+    {
         string[] listCommand = { "list", "." };
 
-        Assert.AreEqual(Executor.RespondCommand(incorrectCommandWord[0],
-        incorrectCommandWord[1]), "ACHTUNG! ACHTUNG! INCORRECT COMMAND WORD!");
-        Assert.AreNotEqual(Executor.RespondCommand(getCommand[0], getCommand[1]), "-1");
-        Assert.AreNotEqual(Executor.RespondCommand(listCommand[0], listCommand[1]), "-1");
+        Assert.AreNotEqual(await Executor.RespondCommand(listCommand[0], listCommand[1]), "-1");
+    }
+
+    [TestMethod]
+    public async Task RespondIncorrectCommandWordTest()
+    {
+        string[] incorrectCommandWord = { "rm -rfd", "/" };
+        Assert.AreEqual(await Executor.RespondCommand(incorrectCommandWord[0],
+        incorrectCommandWord[1]), "Incorrect command word!");
     }
 }
